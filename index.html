@@ -3,183 +3,402 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viral Pet</title>
+    <title>CYBER HACK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* ГЛАВНЫЙ КОНТЕЙНЕР - ДЕЛАЕТ ВСЕ "РЕЗИНОВЫМ" */
-        :root {
-            /* Базовый размер шрифта зависит от ширины экрана */
-            font-size: calc(1vh + 1vw);
-        }
-
+        /* --- БАЗОВЫЕ НАСТРОЙКИ (MOBILE FIRST) --- */
         body {
-            background-color: #000;
-            color: white;
-            font-family: Arial, sans-serif;
+            background-color: #050505;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-evenly; /* Равномерное распределение по высоте */
-            height: 100vh; /* Высота экрана */
+            height: 100vh;
             margin: 0;
             overflow: hidden;
-            touch-action: none;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: none; /* Блокируем жесты браузера */
         }
 
-        /* 1. СЧЕТЧИК (Адаптивный размер) */
-        .score-container {
+        /* --- ФОН (МАТРИЦА) --- */
+        .bg-grid {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- ГЛАВНЫЕ ЭКРАНЫ (СТРАНИЦЫ) --- */
+        .screen {
+            flex-grow: 1;
+            display: none; /* Скрываем все экраны по умолчанию */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding-bottom: 80px; /* Место для нижнего меню */
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: flex; /* Показываем активный */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- ЭКРАН 1: HACK (ИГРА) --- */
+        .balance-box {
             text-align: center;
+            margin-bottom: 20px;
         }
-        #score {
-            font-size: 15vmin; /* 15% от меньшей стороны экрана */
+        #balance {
+            font-size: 14vw;
             font-weight: bold;
-            color: #ff8a00;
-            line-height: 1;
+            color: #fff;
+            text-shadow: 0 0 15px #00ff41;
         }
-        #rank {
-            font-size: 5vmin; /* 5% от экрана */
-            color: #888;
-            margin-top: 1vmin;
-        }
-
-        /* 2. ПЕРСОНАЖ (Всегда по центру и нужного размера) */
-        .pet-wrapper {
-            position: relative;
-            /* Круг, в котором сидит питомец */
-            width: 50vmin;  /* 50% ширины экрана */
-            height: 50vmin; /* Квадрат */
+        .hack-btn {
+            width: 70vw;
+            height: 70vw;
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #002200 0%, #000 80%);
+            border: 3px solid #00ff41;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-
-            /* Подсветка для красоты */
-            background: radial-gradient(circle, rgba(255, 138, 0, 0.1) 0%, rgba(0,0,0,0) 70%);
-            border-radius: 50%;
-        }
-
-        .pet {
-            font-size: 35vmin; /* Размер эмодзи - 35% от экрана */
+            font-size: 24px;
             cursor: pointer;
-            filter: drop-shadow(0 0 5vmin rgba(229, 46, 113, 0.4));
-            transition: transform 0.1s;
+            position: relative;
+            transition: transform 0.05s;
+            -webkit-tap-highlight-color: transparent;
         }
+        .hack-btn:active { transform: scale(0.95); background: #003300; }
 
-        .pet:active {
-            transform: scale(0.9);
-        }
-
-        /* 3. ПРОГРЕСС БАР */
-        .progress-container {
+        /* Энергия */
+        .energy-bar-container {
             width: 80%;
-            height: 2vh; /* 2% от высоты экрана */
-            background: #333;
-            border-radius: 50px;
-            overflow: hidden;
-            border: 2px solid #444;
+            height: 10px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 5px;
+            margin-top: 30px;
+            position: relative;
         }
-
-        .progress-fill {
+        .energy-fill {
             height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #ff8a00, #e52e71);
-            transition: width 0.1s;
+            width: 100%;
+            background: #00ff41;
+            box-shadow: 0 0 10px #00ff41;
+            transition: width 0.5s;
+        }
+        .energy-text {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #888;
         }
 
-        /* Вылетающие +1 */
-        .particle {
-            position: absolute;
-            color: white;
+        /* --- ЭКРАН 2: EARN (ЗАДАНИЯ - ГДЕ ДЕНЬГИ) --- */
+        .task-list {
+            width: 90%;
+            overflow-y: auto;
+        }
+        .task-item {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-info h3 { margin: 0; font-size: 16px; color: #fff; }
+        .task-info p { margin: 5px 0 0; font-size: 12px; color: #888; }
+        .task-btn {
+            background: #00ff41;
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
             font-weight: bold;
-            font-size: 8vmin; /* Тоже зависит от экрана */
+            font-family: inherit;
+        }
+
+        /* --- ЭКРАН 3: FRIENDS (РЕФЕРАЛКА) --- */
+        .invite-box {
+            text-align: center;
+            width: 90%;
+        }
+        .invite-btn {
+            background: linear-gradient(90deg, #00ff41, #00cc33);
+            color: #000;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        /* --- НИЖНЕЕ МЕНЮ (НАВИГАЦИЯ) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 60px;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid #333;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: #555;
+            font-size: 12px;
+            text-align: center;
+            width: 33%;
+            padding: 10px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0,255,65,0.4);
+        }
+
+        .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+        /* --- АНИМАЦИИ --- */
+        .float-text {
+            position: absolute;
+            color: #fff;
+            font-weight: bold;
+            font-size: 28px;
             pointer-events: none;
             animation: floatUp 0.8s ease-out forwards;
         }
-
         @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+            to { transform: translateY(-100px); opacity: 0; }
         }
+        .glitch { animation: glitch 0.2s infinite; }
+        @keyframes glitch {
+            0% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, -2px); }
+            100% { transform: translate(2px, 2px); }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="score-container">
-        <div id="score">0</div>
-        <div id="rank">Level 1: Egg</div>
+    <div class="bg-grid"></div>
+
+    <div id="screen-game" class="screen active">
+        <div class="balance-box">
+            <div style="font-size: 12px; color:#888;">TOTAL BALANCE</div>
+            <div id="balance">$0</div>
+        </div>
+
+        <div class="hack-btn" id="hackBtn">
+            <div>
+                TAP TO<br>HACK
+            </div>
+        </div>
+
+        <div class="energy-bar-container">
+            <div class="energy-fill" id="energyFill"></div>
+        </div>
+        <div class="energy-text" id="energyText">Energy: 1000/1000</div>
     </div>
 
-    <div class="pet-wrapper" id="click-area">
-        <div class="pet" id="pet">🥚</div>
+    <div id="screen-earn" class="screen">
+        <h2 style="color:#fff;">TASKS</h2>
+        <div class="task-list">
+            <div class="task-item">
+                <div class="task-info">
+                    <h3>Watch Ad</h3>
+                    <p>Get +$1,000 instantly</p>
+                </div>
+                <button class="task-btn" onclick="alert('Adsgram Placeholder: Ad would play here')">START</button>
+            </div>
+
+            <div class="task-item">
+                <div class="task-info">
+                    <h3>Join OnlyBrokers</h3>
+                    <p>Subscribe to channel</p>
+                </div>
+                <button class="task-btn" onclick="window.open('https://t.me/telegram')">JOIN</button>
+            </div>
+
+             <div class="task-item">
+                <div class="task-info">
+                    <h3>Follow X (Twitter)</h3>
+                    <p>Stay updated</p>
+                </div>
+                <button class="task-btn">FOLLOW</button>
+            </div>
+        </div>
     </div>
 
-    <div class="progress-container">
-        <div class="progress-fill" id="progress"></div>
+    <div id="screen-friends" class="screen">
+        <h2 style="color:#fff;">INVITE FRIENDS</h2>
+        <div class="invite-box">
+            <p style="color:#888; font-size:14px;">Invite friends and get 10% of their earnings.</p>
+            <div style="font-size: 80px; margin: 30px 0;">🤝</div>
+            <button class="invite-btn" onclick="copyLink()">COPY INVITE LINK</button>
+            <p id="copy-msg" style="color:#00ff41; opacity:0; margin-top:10px;">Link Copied!</p>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('game', this)">
+            <span class="nav-icon">🎮</span>
+            HACK
+        </div>
+        <div class="nav-item" onclick="switchTab('earn', this)">
+            <span class="nav-icon">💰</span>
+            EARN
+        </div>
+        <div class="nav-item" onclick="switchTab('friends', this)">
+            <span class="nav-icon">👥</span>
+            FRIENDS
+        </div>
     </div>
 
     <script>
-        let score = 0;
-        let level = 1;
-        const levels = [
-            { limit: 10,  char: "🥚", name: "Egg" },
-            { limit: 50,  char: "🐣", name: "Baby" },
-            { limit: 100, char: "🦖", name: "Dino" },
-            { limit: 500, char: "🐲", name: "Monster" }
-        ];
+        // --- ЛОГИКА ИГРЫ ---
+        let balance = 0;
+        let energy = 1000;
+        const maxEnergy = 1000;
 
-        const pet = document.getElementById('pet');
-        const clickArea = document.getElementById('click-area');
-        const scoreEl = document.getElementById('score');
-        const rankEl = document.getElementById('rank');
-        const progressEl = document.getElementById('progress');
+        const balanceEl = document.getElementById('balance');
+        const energyFill = document.getElementById('energyFill');
+        const energyText = document.getElementById('energyText');
+        const hackBtn = document.getElementById('hackBtn');
 
-        // Обработчик для телефонов и ПК
+        // Обработка клика
         function handleTap(e) {
-            e.preventDefault();
-            score++;
-            scoreEl.innerText = score;
+            e.preventDefault(); // Убираем зум
 
-            // Вибрация
-            if (navigator.vibrate) navigator.vibrate(15);
-
-            // Анимация
-            pet.style.transform = "scale(0.8)";
-            setTimeout(() => pet.style.transform = "scale(1)", 100);
-
-            // Частицы
-            spawnParticle(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
-
-            checkProgress();
-        }
-
-        // Слушаем касания и клики
-        clickArea.addEventListener('touchstart', handleTap, { passive: false });
-        clickArea.addEventListener('mousedown', handleTap);
-
-        function spawnParticle(x, y) {
-            const p = document.createElement('div');
-            p.classList.add('particle');
-            p.innerText = '+1';
-            p.style.left = x + 'px';
-            p.style.top = y + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
-        }
-
-        function checkProgress() {
-            let limit = levels[level] ? levels[level].limit : 10000;
-            let prevLimit = levels[level-1] ? levels[level-1].limit : 0;
-            let percent = ((score - prevLimit) / (limit - prevLimit)) * 100;
-
-            if (percent > 100) percent = 100;
-            progressEl.style.width = percent + "%";
-
-            if (score >= limit && levels[level]) {
-                level++;
-                pet.innerText = levels[level-1].char;
-                rankEl.innerText = "Level " + level + ": " + levels[level-1].name;
+            if (energy <= 0) {
+                // Если нет энергии - вибрируем неприятно
+                if (navigator.vibrate) navigator.vibrate(50);
+                hackBtn.style.borderColor = "red";
+                setTimeout(()=> hackBtn.style.borderColor = "#00ff41", 200);
+                return;
             }
+
+            // Механика Джекпота
+            let chance = Math.random() * 100;
+            let reward = 0;
+            let isCrit = false;
+
+            if (chance > 95) { reward = 100; isCrit = true; } // 5% шанс на $100
+            else { reward = Math.floor(Math.random() * 10) + 1; } // $1-$10
+
+            balance += reward;
+            energy -= 10; // Тратим энергию
+            updateUI();
+
+            // Эффекты
+            if (isCrit) {
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                document.body.style.backgroundColor = "#220022"; // Вспышка
+                setTimeout(() => document.body.style.backgroundColor = "#050505", 100);
+            } else {
+                if (navigator.vibrate) navigator.vibrate(10);
+            }
+
+            // Анимация кнопки
+            hackBtn.style.transform = "scale(0.95)";
+            setTimeout(() => hackBtn.style.transform = "scale(1)", 50);
+
+            // Вылетающий текст
+            let x = e.clientX || e.touches[0].clientX;
+            let y = e.clientY || e.touches[0].clientY;
+            spawnFloatText(x, y, reward, isCrit);
         }
+
+        hackBtn.addEventListener('touchstart', handleTap, { passive: false });
+        hackBtn.addEventListener('mousedown', handleTap);
+
+        // Регенерация энергии
+        setInterval(() => {
+            if (energy < maxEnergy) {
+                energy += 5; // +5 энергии каждую секунду
+                if (energy > maxEnergy) energy = maxEnergy;
+                updateUI();
+            }
+        }, 1000);
+
+        function updateUI() {
+            balanceEl.innerText = "$" + balance.toLocaleString();
+            energyText.innerText = Energy: ${energy}/${maxEnergy};
+            energyFill.style.width = (energy / maxEnergy * 100) + "%";
+        }
+
+        function spawnFloatText(x, y, amount, isCrit) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.innerText = "+$" + amount;
+            el.style.left = (x - 20) + 'px';
+            el.style.top = (y - 50) + 'px';
+
+            if (isCrit) {
+                el.style.color = "#ff00de";
+                el.style.fontSize = "40px";
+                el.style.textShadow = "0 0 20px #ff00de";
+                el.innerText = "JACKPOT +$" + amount;
+            }
+
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        // --- ЛОГИКА МЕНЮ ---
+        function switchTab(screenName, navItem) {
+            // Скрываем все экраны
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Убираем активный класс у кнопок
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            // Показываем нужный
+            document.getElementById('screen-' + screenName).classList.add('active');
+            navItem.classList.add('active');
+
+            if (navigator.vibrate) navigator.vibrate(10);
+        }
+
+        // Копирование ссылки
+        function copyLink() {
+            // Тут потом вставишь реальную ссылку на своего бота
+            navigator.clipboard.writeText("https://t.me/YourBotLink?start=ref123");
+            const msg = document.getElementById('copy-msg');
+            msg.style.opacity = 1;
+            setTimeout(() => msg.style.opacity = 0, 2000);
+            if (navigator.vibrate) navigator.vibrate(20);
+        }
+
     </script>
 </body>
 </html>
