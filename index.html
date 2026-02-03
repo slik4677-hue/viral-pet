@@ -6,7 +6,7 @@
     <title>CYBER HACK</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* --- БАЗОВЫЕ НАСТРОЙКИ (MOBILE FIRST) --- */
+        /* --- СТИЛИ --- */
         body {
             background-color: #050505;
             color: #00ff41;
@@ -18,52 +18,45 @@
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: none; /* Блокируем жесты браузера */
+            touch-action: manipulation; /* Разрешаем клики, запрещаем зум */
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- ФОН (МАТРИЦА) --- */
         .bg-grid {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
                         linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
             background-size: 20px 20px;
-            z-index: -1;
-            pointer-events: none;
+            z-index: -1; /* Фон всегда сзади */
         }
 
-        /* --- ГЛАВНЫЕ ЭКРАНЫ (СТРАНИЦЫ) --- */
         .screen {
             flex-grow: 1;
-            display: none; /* Скрываем все экраны по умолчанию */
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding-bottom: 80px; /* Место для нижнего меню */
-            animation: fadeIn 0.3s ease;
+            padding-bottom: 80px;
         }
+        .screen.active { display: flex; }
 
-        .screen.active {
-            display: flex; /* Показываем активный */
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- ЭКРАН 1: HACK (ИГРА) --- */
-        .balance-box {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        .balance-box { text-align: center; margin-bottom: 30px; z-index: 5; }
         #balance {
-            font-size: 14vw;
+            font-size: 16vw;
             font-weight: bold;
             color: #fff;
             text-shadow: 0 0 15px #00ff41;
         }
+        @media (min-width: 600px) { #balance { font-size: 80px; } }
+
+        /* --- КНОПКА (САМАЯ ВАЖНАЯ ЧАСТЬ) --- */
+        .hack-btn-wrapper {
+            position: relative;
+            z-index: 9999; /* Кнопка выше всего на свете */
+        }
+
         .hack-btn {
             width: 70vw;
             height: 70vw;
@@ -71,141 +64,75 @@
             max-height: 300px;
             border-radius: 50%;
             background: radial-gradient(circle, #002200 0%, #000 80%);
-            border: 3px solid #00ff41;
+            border: 4px solid #00ff41; /* Жирная рамка */
             box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            position: relative;
             transition: transform 0.05s;
-            -webkit-tap-highlight-color: transparent;
         }
-        .hack-btn:active { transform: scale(0.95); background: #003300; }
 
-        /* Энергия */
+        .hack-btn:active {
+            transform: scale(0.90);
+            background: #004400;
+        }
+
         .energy-bar-container {
             width: 80%;
             height: 10px;
             background: #111;
             border: 1px solid #333;
-            border-radius: 5px;
-            margin-top: 30px;
-            position: relative;
+            border-radius: 4px;
+            margin-top: 40px;
+            z-index: 5;
         }
         .energy-fill {
             height: 100%;
             width: 100%;
             background: #00ff41;
-            box-shadow: 0 0 10px #00ff41;
-            transition: width 0.5s;
-        }
-        .energy-text {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #888;
+            transition: width 0.5s linear;
         }
 
-        /* --- ЭКРАН 2: EARN (ЗАДАНИЯ - ГДЕ ДЕНЬГИ) --- */
-        .task-list {
-            width: 90%;
-            overflow-y: auto;
-        }
-        .task-item {
-            background: #111;
-            border: 1px solid #333;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .task-info h3 { margin: 0; font-size: 16px; color: #fff; }
-        .task-info p { margin: 5px 0 0; font-size: 12px; color: #888; }
-        .task-btn {
-            background: #00ff41;
-            color: #000;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-family: inherit;
-        }
-
-        /* --- ЭКРАН 3: FRIENDS (РЕФЕРАЛКА) --- */
-        .invite-box {
-            text-align: center;
-            width: 90%;
-        }
-        .invite-btn {
-            background: linear-gradient(90deg, #00ff41, #00cc33);
-            color: #000;
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 20px;
-            font-family: inherit;
-            cursor: pointer;
-        }
-
-        /* --- НИЖНЕЕ МЕНЮ (НАВИГАЦИЯ) --- */
-        .bottom-nav {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            height: 60px;
-            background: rgba(20, 20, 20, 0.95);
-            border: 1px solid #333;
-            border-radius: 20px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
-
-        .nav-item {
-            color: #555;
-            font-size: 12px;
-            text-align: center;
-            width: 33%;
-            padding: 10px;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .nav-item.active {
-            color: #00ff41;
-            text-shadow: 0 0 10px rgba(0,255,65,0.4);
-        }
-
-        .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
-
-        /* --- АНИМАЦИИ --- */
+        /* Вылетающий текст */
         .float-text {
             position: absolute;
             color: #fff;
             font-weight: bold;
-            font-size: 28px;
-            pointer-events: none;
+            font-size: 32px;
+            pointer-events: none; /* Текст пропускает клики сквозь себя */
+            z-index: 1000;
             animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 0 0 5px #00ff41;
         }
-        @keyframes floatUp {
-            to { transform: translateY(-100px); opacity: 0; }
+        @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
+
+        /* Меню */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; height: 65px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333; border-radius: 20px;
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 10000; /* Меню тоже высоко */
+            cursor: pointer;
         }
-        .glitch { animation: glitch 0.2s infinite; }
-        @keyframes glitch {
-            0% { transform: translate(2px, 2px); }
-            50% { transform: translate(-2px, -2px); }
-            100% { transform: translate(2px, 2px); }
+        .nav-item { color: #555; font-size: 10px; text-align: center; width: 33%; padding: 10px; }
+        .nav-item.active { color: #00ff41; }
+        .nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
+
+        /* Вкладки */
+        .task-list { width: 90%; height: 60vh; overflow-y: auto; z-index: 10; }
+        .task-item {
+            background: rgba(0, 20, 0, 0.8);
+            border: 1px solid #004400;
+            padding: 15px; margin-bottom: 10px; border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .task-btn { background: #00ff41; color: #000; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer;}
+        .invite-box { text-align: center; width: 90%; z-index: 10; }
+        .invite-btn { background: #00ff41; color: #000; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; }
 
     </style>
 </head>
@@ -215,149 +142,96 @@
 
     <div id="screen-game" class="screen active">
         <div class="balance-box">
-            <div style="font-size: 12px; color:#888;">TOTAL BALANCE</div>
+            <div style="font-size: 12px; color:#666; letter-spacing: 2px;">WALLET</div>
             <div id="balance">$0</div>
         </div>
 
-        <div class="hack-btn" id="hackBtn">
-            <div>
-                TAP TO<br>HACK
+        <div class="hack-btn-wrapper">
+            <div class="hack-btn" id="hackBtn" onclick="gameTap(event)">
+                <div style="pointer-events: none;">TAP TO<br>HACK</div>
             </div>
         </div>
 
         <div class="energy-bar-container">
             <div class="energy-fill" id="energyFill"></div>
         </div>
-        <div class="energy-text" id="energyText">Energy: 1000/1000</div>
+        <div style="margin-top:5px; color:#666; font-size:12px;">Power: 1000/1000</div>
     </div>
 
     <div id="screen-earn" class="screen">
-        <h2 style="color:#fff;">TASKS</h2>
+        <h2 style="color:#fff; margin-bottom: 20px;">TASKS</h2>
         <div class="task-list">
             <div class="task-item">
-                <div class="task-info">
-                    <h3>Watch Ad</h3>
-                    <p>Get +$1,000 instantly</p>
-                </div>
-                <button class="task-btn" onclick="alert('Adsgram Placeholder: Ad would play here')">START</button>
+                <div><h3 style="margin:0; font-size:16px;">Watch Ad</h3><p style="margin:5px 0 0; font-size:12px; color:#888;">+$1,000 Reward</p></div>
+                <button class="task-btn">PLAY</button>
             </div>
-
             <div class="task-item">
-                <div class="task-info">
-                    <h3>Join OnlyBrokers</h3>
-                    <p>Subscribe to channel</p>
-                </div>
-                <button class="task-btn" onclick="window.open('https://t.me/telegram')">JOIN</button>
-            </div>
-
-             <div class="task-item">
-                <div class="task-info">
-                    <h3>Follow X (Twitter)</h3>
-                    <p>Stay updated</p>
-                </div>
-                <button class="task-btn">FOLLOW</button>
+                <div><h3 style="margin:0; font-size:16px;">Join Channel</h3><p style="margin:5px 0 0; font-size:12px; color:#888;">Get Info</p></div>
+                <button class="task-btn">JOIN</button>
             </div>
         </div>
     </div>
 
     <div id="screen-friends" class="screen">
-        <h2 style="color:#fff;">INVITE FRIENDS</h2>
+        <h2 style="color:#fff;">NETWORK</h2>
         <div class="invite-box">
-            <p style="color:#888; font-size:14px;">Invite friends and get 10% of their earnings.</p>
-            <div style="font-size: 80px; margin: 30px 0;">🤝</div>
-            <button class="invite-btn" onclick="copyLink()">COPY INVITE LINK</button>
-            <p id="copy-msg" style="color:#00ff41; opacity:0; margin-top:10px;">Link Copied!</p>
+            <p style="color:#888;">Invite brokers & earn 10%.</p>
+            <div style="font-size: 60px; margin: 30px 0;">🌐</div>
+            <button class="invite-btn" onclick="copyLink()">COPY LINK</button>
+            <p id="copy-msg" style="color:#00ff41; opacity:0; margin-top:10px;">COPIED!</p>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('game', this)">
-            <span class="nav-icon">🎮</span>
-            HACK
-        </div>
-        <div class="nav-item" onclick="switchTab('earn', this)">
-            <span class="nav-icon">💰</span>
-            EARN
-        </div>
-        <div class="nav-item" onclick="switchTab('friends', this)">
-            <span class="nav-icon">👥</span>
-            FRIENDS
-        </div>
+        <div class="nav-item active" onclick="switchTab('game', this)"><span class="nav-icon">💻</span>HACK</div>
+        <div class="nav-item" onclick="switchTab('earn', this)"><span class="nav-icon">💵</span>EARN</div>
+        <div class="nav-item" onclick="switchTab('friends', this)"><span class="nav-icon">👥</span>TEAM</div>
     </div>
 
     <script>
-        // --- ЛОГИКА ИГРЫ ---
         let balance = 0;
         let energy = 1000;
         const maxEnergy = 1000;
 
         const balanceEl = document.getElementById('balance');
         const energyFill = document.getElementById('energyFill');
-        const energyText = document.getElementById('energyText');
-        const hackBtn = document.getElementById('hackBtn');
 
-        // Обработка клика
-        function handleTap(e) {
-            e.preventDefault(); // Убираем зум
+        // === ПРОСТАЯ ФУНКЦИЯ КЛИКА ===
+        function gameTap(event) {
+            // Вибрация сразу
+            if (navigator.vibrate) navigator.vibrate(15);
 
-            if (energy <= 0) {
-                // Если нет энергии - вибрируем неприятно
-                if (navigator.vibrate) navigator.vibrate(50);
-                hackBtn.style.borderColor = "red";
-                setTimeout(()=> hackBtn.style.borderColor = "#00ff41", 200);
-                return;
-            }
+            // Проверка энергии
+            if (energy <= 0) return;
 
-            // Механика Джекпота
-            let chance = Math.random() * 100;
-            let reward = 0;
-            let isCrit = false;
-
-            if (chance > 95) { reward = 100; isCrit = true; } // 5% шанс на $100
-            else { reward = Math.floor(Math.random() * 10) + 1; } // $1-$10
+            // Деньги
+            let reward = Math.floor(Math.random() * 10) + 1;
+            let isCrit = Math.random() > 0.95;
+            if (isCrit) reward = 100;
 
             balance += reward;
-            energy -= 10; // Тратим энергию
-            updateUI();
+            energy = Math.max(0, energy - 10);
 
-            // Эффекты
-            if (isCrit) {
-                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-                document.body.style.backgroundColor = "#220022"; // Вспышка
-                setTimeout(() => document.body.style.backgroundColor = "#050505", 100);
-            } else {
-                if (navigator.vibrate) navigator.vibrate(10);
-            }
-
-            // Анимация кнопки
-            hackBtn.style.transform = "scale(0.95)";
-            setTimeout(() => hackBtn.style.transform = "scale(1)", 50);
-
-            // Вылетающий текст
-            let x = e.clientX || e.touches[0].clientX;
-            let y = e.clientY || e.touches[0].clientY;
-            spawnFloatText(x, y, reward, isCrit);
-        }
-
-        hackBtn.addEventListener('touchstart', handleTap, { passive: false });
-        hackBtn.addEventListener('mousedown', handleTap);
-
-        // Регенерация энергии
-        setInterval(() => {
-            if (energy < maxEnergy) {
-                energy += 5; // +5 энергии каждую секунду
-                if (energy > maxEnergy) energy = maxEnergy;
-                updateUI();
-            }
-        }, 1000);
-
-        function updateUI() {
+            // Обновляем текст
             balanceEl.innerText = "$" + balance.toLocaleString();
-            energyText.innerText = Energy: ${energy}/${maxEnergy};
             energyFill.style.width = (energy / maxEnergy * 100) + "%";
+
+            // Вылетающие цифры
+            // Берем координаты клика или тапа
+            let x, y;
+            if (event.touches && event.touches.length > 0) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
+            } else {
+                x = event.clientX;
+                y = event.clientY;
+            }
+
+            spawnText(x, y, reward, isCrit);
         }
 
-        function spawnFloatText(x, y, amount, isCrit) {
+        // Спавн текста
+        function spawnText(x, y, amount, isCrit) {
             const el = document.createElement('div');
             el.className = 'float-text';
             el.innerText = "+$" + amount;
@@ -367,38 +241,34 @@
             if (isCrit) {
                 el.style.color = "#ff00de";
                 el.style.fontSize = "40px";
-                el.style.textShadow = "0 0 20px #ff00de";
                 el.innerText = "JACKPOT +$" + amount;
+                el.style.zIndex = "1001";
             }
-
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 800);
         }
 
-        // --- ЛОГИКА МЕНЮ ---
-        function switchTab(screenName, navItem) {
-            // Скрываем все экраны
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // Убираем активный класс у кнопок
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        // Энергия
+        setInterval(() => {
+            if (energy < maxEnergy) {
+                energy += 5;
+                energyFill.style.width = (energy / maxEnergy * 100) + "%";
+            }
+        }, 1000);
 
-            // Показываем нужный
+        // Вкладки
+        function switchTab(screenName, navItem) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('screen-' + screenName).classList.add('active');
             navItem.classList.add('active');
-
-            if (navigator.vibrate) navigator.vibrate(10);
         }
 
-        // Копирование ссылки
         function copyLink() {
-            // Тут потом вставишь реальную ссылку на своего бота
-            navigator.clipboard.writeText("https://t.me/YourBotLink?start=ref123");
             const msg = document.getElementById('copy-msg');
             msg.style.opacity = 1;
             setTimeout(() => msg.style.opacity = 0, 2000);
-            if (navigator.vibrate) navigator.vibrate(20);
         }
-
     </script>
 </body>
 </html>
