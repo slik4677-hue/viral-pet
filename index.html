@@ -5,144 +5,242 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Viral Pet</title>
     <style>
+        /* --- НАСТРОЙКИ ЭКРАНА (ЧТОБЫ НЕ ДЕРГАЛСЯ) --- */
         body {
             background-color: #000;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
-            /* ОТКЛЮЧАЕМ выделение текста и зум по двойному тапу */
-            user-select: none;
+            overflow: hidden; /* Нет скролла */
+            touch-action: none; /* ОТКЛЮЧАЕМ ВСЕ ЖЕСТЫ БРАУЗЕРА */
+            user-select: none; /* Нет выделения текста */
             -webkit-user-select: none;
-            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Счетчик очков */
-        #score {
-            font-size: 50px;
-            font-weight: bold;
+        /* --- СЧЕТЧИК --- */
+        .score-container {
+            text-align: center;
             margin-bottom: 20px;
-            color: #ff8a00;
-            text-shadow: 0 0 10px #ff8a00;
+            z-index: 10;
+        }
+        #score {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: monospace;
+        }
+        #rank {
+            color: #888;
+            font-size: 18px;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        /* Наш персонаж */
-        .pet-container {
-            font-size: 120px;
+        /* --- ПЕРСОНАЖ --- */
+        .pet-wrapper {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pet {
+            font-size: 140px;
             cursor: pointer;
-            transition: transform 0.05s;
-            /* Запрет на перетаскивание картинки */
-            -webkit-user-drag: none;
+            filter: drop-shadow(0 0 30px rgba(229, 46, 113, 0.4));
+            animation: breathe 3s infinite ease-in-out;
+            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Важно для защиты от перетаскивания */
+            pointer-events: auto;
         }
 
-        /* Эффект нажатия (анимация) */
-        .pet-container:active {
-            transform: scale(0.9);
+        /* Анимация дыхания (покоя) */
+        @keyframes breathe {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        h1 { font-size: 24px; margin-bottom: 5px; text-align: center;}
-        p.hint { color: #888; font-size: 14px; margin-top: 5px; }
+        /* Класс для анимации клика (удар) */
+        .pet.clicked {
+            transform: scale(0.9) !important;
+        }
 
-        /* Полоска жизни */
-        .progress-bar {
+        /* --- ВЫЛЕТАЮЩИЕ ЦИФРЫ --- */
+        .particle {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            font-size: 28px;
+            pointer-events: none; /* Сквозь них можно кликать */
+            animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1.5); opacity: 0; }
+        }
+
+        /* --- ПРОГРЕСС БАР --- */
+        .progress-container {
             width: 80%;
-            height: 15px;
-            background-color: #333;
-            border-radius: 10px;
-            margin-top: 30px;
+            max-width: 300px;
+            height: 12px;
+            background: #333;
+            border-radius: 20px;
+            margin-top: 50px;
             overflow: hidden;
-            border: 2px solid #555;
+            border: 2px solid #444;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
+
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #ff8a00, #e52e71);
             width: 0%;
-            transition: width 0.2s;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            transition: width 0.2s ease-out;
+            border-radius: 20px;
+        }
+
+        p.hint {
+            color: #555;
+            font-size: 12px;
+            margin-top: 10px;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
 
-    <h1 id="level-title">Level 1: Mystery Egg</h1>
-    <div id="score">0</div>
+    <div class="score-container">
+        <div id="score">0</div>
+        <div id="rank">Level 1: Egg</div>
+    </div>
 
-    <div class="pet-container" id="pet">🥚</div>
+    <div class="pet-wrapper" id="click-area">
+        <div class="pet" id="pet">🥚</div>
+    </div>
 
-    <div class="progress-bar">
+    <div class="progress-container">
         <div class="progress-fill" id="progress"></div>
     </div>
 
-    <p class="hint">Tap fast to evolve!</p>
+    <p class="hint">TAP FAST!</p>
 
     <script>
+        // --- ЛОГИКА ИГРЫ ---
         let score = 0;
-        let level = 1;
+        let currentLevel = 1;
+
+        // Настройки уровней (Сколько кликов нужно для следующего)
+        const levels = [
+            { limit: 10,  char: "🥚", name: "Egg" },
+            { limit: 50,  char: "🐣", name: "Baby Dino" },
+            { limit: 150, char: "🦖", name: "Raptor" },
+            { limit: 500, char: "🐲", name: "GODZILLA" }
+        ];
 
         const pet = document.getElementById('pet');
-        const scoreElement = document.getElementById('score');
-        const progressElement = document.getElementById('progress');
-        const titleElement = document.getElementById('level-title');
+        const clickArea = document.getElementById('click-area');
+        const scoreEl = document.getElementById('score');
+        const rankEl = document.getElementById('rank');
+        const progressEl = document.getElementById('progress');
 
-        // Обработка клика
-        pet.addEventListener('pointerdown', function(event) {
-            // Эта команда запрещает браузеру делать что-то лишнее (типа зума)
-            event.preventDefault();
+        // ГЛАВНЫЙ ОБРАБОТЧИК (Работает идеально на мобилках)
+        clickArea.addEventListener('pointerdown', function(e) {
+            // Блокируем любые браузерные действия
+            e.preventDefault();
 
-            score++;
-            scoreElement.innerText = score;
-
-            // Вибрация (для Android)
-            if (navigator.vibrate) navigator.vibrate(40);
-
-            // Анимация уменьшения при клике (вручную, для надежности)
-            pet.style.transform = "scale(0.9)";
-            setTimeout(() => pet.style.transform = "scale(1)", 100);
-
-            checkLevel();
+            // Запускаем клик
+            handleClick(e);
         });
 
-        function checkLevel() {
-            // ЛОГИКА УРОВНЕЙ
+        function handleClick(e) {
+            score++;
+            scoreEl.innerText = score;
 
-            // Уровень 1: Яйцо (до 50 кликов)
-            if (score < 50) {
-                let percentage = (score / 50) * 100;
-                progressElement.style.width = percentage + "%";
-            }
+            // 1. Анимация нажатия (CSS класс)
+            pet.classList.add('clicked');
+            setTimeout(() => pet.classList.remove('clicked'), 50);
 
-            // ЭВОЛЮЦИЯ 1: Динозаврик (на 50 кликах)
-            else if (score === 50) {
-                level = 2;
-                pet.innerText = "🦖";
-                titleElement.innerText = "Level 2: Baby Dino";
-                progressElement.style.width = "0%"; // Сброс полоски для нового уровня
-            }
+            // 2. Вибрация (Тактильная отдача)
+            if (navigator.vibrate) navigator.vibrate(10);
 
-            // Уровень 2: Растем до 200 (от 50 до 200)
-            else if (score > 50 && score < 200) {
-                let percentage = ((score - 50) / 150) * 100; // Сложная математика прогресса
-                progressElement.style.width = percentage + "%";
-            }
+            // 3. Вылетающая цифра (+1)
+            spawnParticle(e.clientX, e.clientY);
 
-            // ЭВОЛЮЦИЯ 2: КРУТОЙ ДИНОЗАВР (на 200 кликах)
-            else if (score === 200) {
-                level = 3;
-                pet.innerText = "🐉"; // Дракон или Ти-Рекс
-                titleElement.innerText = "Level 3: GIGA CHAD";
-                alert("🔥 ULTIMATE EVOLUTION!");
-            }
+            // 4. Проверка уровня
+            checkProgress();
+        }
 
-            // Дальше просто бесконечность
-            else {
-                progressElement.style.width = "100%";
+        // Функция создания красивых циферок +1
+        function spawnParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.innerText = '+' + 1; // Можно менять, если даешь больше очков
+
+            // Немного случайности, чтобы цифры летели в разные стороны
+            const offsetX = (Math.random() - 0.5) * 40;
+
+            particle.style.left = (x + offsetX) + 'px';
+            particle.style.top = y + 'px';
+
+            document.body.appendChild(particle);
+
+            // Удаляем элемент после анимации
+            setTimeout(() => particle.remove(), 800);
+        }
+
+        function checkProgress() {
+            // Берем текущую цель
+            let target = levels[currentLevel] ? levels[currentLevel].limit : 1000000;
+            let prevTarget = levels[currentLevel-1] ? levels[currentLevel-1].limit : 0;
+
+            // Расчет полоски (математика, чтобы она плавно росла)
+            let range = target - prevTarget;
+            let currentProgress = score - prevTarget;
+            let percent = (currentProgress / range) * 100;
+
+            if (percent > 100) percent = 100;
+            progressEl.style.width = percent + "%";
+
+            // ЭВОЛЮЦИЯ!
+            if (score >= target && levels[currentLevel]) {
+                evolve(levels[currentLevel]);
+                currentLevel++;
             }
         }
-    </script>
 
+        function evolve(nextStage) {
+            // Эффект превращения
+            pet.style.transform = "scale(0) rotate(360deg)"; // Исчезает
+
+            setTimeout(() => {
+                pet.innerText = nextStage.char; // Меняем скин
+                rankEl.innerText = "Level " + (currentLevel + 1) + ": " + nextStage.name;
+                pet.style.transform = "scale(1.2) rotate(0deg)"; // Появляется красиво
+
+                // Сильная вибрация при успехе
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+                setTimeout(() => pet.style.transform = "scale(1)", 200);
+            }, 200);
+        }
+
+        // Инициализация при старте
+        rankEl.innerText = "Level 1: " + levels[0].name;
+    </script>
 </body>
 </html>
