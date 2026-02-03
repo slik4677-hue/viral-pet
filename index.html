@@ -5,120 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Viral Pet</title>
     <style>
-        /* --- НАСТРОЙКИ ЭКРАНА (ЧТОБЫ НЕ ДЕРГАЛСЯ) --- */
+        /* ГЛАВНЫЙ КОНТЕЙНЕР - ДЕЛАЕТ ВСЕ "РЕЗИНОВЫМ" */
+        :root {
+            /* Базовый размер шрифта зависит от ширины экрана */
+            font-size: calc(1vh + 1vw);
+        }
+
         body {
             background-color: #000;
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            justify-content: space-evenly; /* Равномерное распределение по высоте */
+            height: 100vh; /* Высота экрана */
             margin: 0;
-            overflow: hidden; /* Нет скролла */
-            touch-action: none; /* ОТКЛЮЧАЕМ ВСЕ ЖЕСТЫ БРАУЗЕРА */
-            user-select: none; /* Нет выделения текста */
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- СЧЕТЧИК --- */
+        /* 1. СЧЕТЧИК (Адаптивный размер) */
         .score-container {
             text-align: center;
-            margin-bottom: 20px;
-            z-index: 10;
         }
         #score {
-            font-size: 64px;
-            font-weight: 800;
-            background: linear-gradient(to right, #ff8a00, #e52e71);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-family: monospace;
+            font-size: 15vmin; /* 15% от меньшей стороны экрана */
+            font-weight: bold;
+            color: #ff8a00;
+            line-height: 1;
         }
         #rank {
+            font-size: 5vmin; /* 5% от экрана */
             color: #888;
-            font-size: 18px;
-            margin-top: 5px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            margin-top: 1vmin;
         }
 
-        /* --- ПЕРСОНАЖ --- */
+        /* 2. ПЕРСОНАЖ (Всегда по центру и нужного размера) */
         .pet-wrapper {
             position: relative;
-            width: 250px;
-            height: 250px;
+            /* Круг, в котором сидит питомец */
+            width: 50vmin;  /* 50% ширины экрана */
+            height: 50vmin; /* Квадрат */
             display: flex;
             align-items: center;
             justify-content: center;
+
+            /* Подсветка для красоты */
+            background: radial-gradient(circle, rgba(255, 138, 0, 0.1) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
         }
 
         .pet {
-            font-size: 140px;
+            font-size: 35vmin; /* Размер эмодзи - 35% от экрана */
             cursor: pointer;
-            filter: drop-shadow(0 0 30px rgba(229, 46, 113, 0.4));
-            animation: breathe 3s infinite ease-in-out;
-            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* Важно для защиты от перетаскивания */
-            pointer-events: auto;
+            filter: drop-shadow(0 0 5vmin rgba(229, 46, 113, 0.4));
+            transition: transform 0.1s;
         }
 
-        /* Анимация дыхания (покоя) */
-        @keyframes breathe {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .pet:active {
+            transform: scale(0.9);
         }
 
-        /* Класс для анимации клика (удар) */
-        .pet.clicked {
-            transform: scale(0.9) !important;
-        }
-
-        /* --- ВЫЛЕТАЮЩИЕ ЦИФРЫ --- */
-        .particle {
-            position: absolute;
-            color: white;
-            font-weight: bold;
-            font-size: 28px;
-            pointer-events: none; /* Сквозь них можно кликать */
-            animation: floatUp 0.8s ease-out forwards;
-            text-shadow: 0 0 5px rgba(255,255,255,0.5);
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-120px) scale(1.5); opacity: 0; }
-        }
-
-        /* --- ПРОГРЕСС БАР --- */
+        /* 3. ПРОГРЕСС БАР */
         .progress-container {
             width: 80%;
-            max-width: 300px;
-            height: 12px;
+            height: 2vh; /* 2% от высоты экрана */
             background: #333;
-            border-radius: 20px;
-            margin-top: 50px;
+            border-radius: 50px;
             overflow: hidden;
             border: 2px solid #444;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
         .progress-fill {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, #ff8a00, #e52e71);
-            transition: width 0.2s ease-out;
-            border-radius: 20px;
+            transition: width 0.1s;
         }
 
-        p.hint {
-            color: #555;
-            font-size: 12px;
-            margin-top: 10px;
-            opacity: 0.7;
+        /* Вылетающие +1 */
+        .particle {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            font-size: 8vmin; /* Тоже зависит от экрана */
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
         }
     </style>
 </head>
@@ -137,19 +117,14 @@
         <div class="progress-fill" id="progress"></div>
     </div>
 
-    <p class="hint">TAP FAST!</p>
-
     <script>
-        // --- ЛОГИКА ИГРЫ ---
         let score = 0;
-        let currentLevel = 1;
-
-        // Настройки уровней (Сколько кликов нужно для следующего)
+        let level = 1;
         const levels = [
             { limit: 10,  char: "🥚", name: "Egg" },
-            { limit: 50,  char: "🐣", name: "Baby Dino" },
-            { limit: 150, char: "🦖", name: "Raptor" },
-            { limit: 500, char: "🐲", name: "GODZILLA" }
+            { limit: 50,  char: "🐣", name: "Baby" },
+            { limit: 100, char: "🦖", name: "Dino" },
+            { limit: 500, char: "🐲", name: "Monster" }
         ];
 
         const pet = document.getElementById('pet');
@@ -158,89 +133,53 @@
         const rankEl = document.getElementById('rank');
         const progressEl = document.getElementById('progress');
 
-        // ГЛАВНЫЙ ОБРАБОТЧИК (Работает идеально на мобилках)
-        clickArea.addEventListener('pointerdown', function(e) {
-            // Блокируем любые браузерные действия
+        // Обработчик для телефонов и ПК
+        function handleTap(e) {
             e.preventDefault();
-
-            // Запускаем клик
-            handleClick(e);
-        });
-
-        function handleClick(e) {
             score++;
             scoreEl.innerText = score;
 
-            // 1. Анимация нажатия (CSS класс)
-            pet.classList.add('clicked');
-            setTimeout(() => pet.classList.remove('clicked'), 50);
+            // Вибрация
+            if (navigator.vibrate) navigator.vibrate(15);
 
-            // 2. Вибрация (Тактильная отдача)
-            if (navigator.vibrate) navigator.vibrate(10);
+            // Анимация
+            pet.style.transform = "scale(0.8)";
+            setTimeout(() => pet.style.transform = "scale(1)", 100);
 
-            // 3. Вылетающая цифра (+1)
-            spawnParticle(e.clientX, e.clientY);
+            // Частицы
+            spawnParticle(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
 
-            // 4. Проверка уровня
             checkProgress();
         }
 
-        // Функция создания красивых циферок +1
+        // Слушаем касания и клики
+        clickArea.addEventListener('touchstart', handleTap, { passive: false });
+        clickArea.addEventListener('mousedown', handleTap);
+
         function spawnParticle(x, y) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            particle.innerText = '+' + 1; // Можно менять, если даешь больше очков
-
-            // Немного случайности, чтобы цифры летели в разные стороны
-            const offsetX = (Math.random() - 0.5) * 40;
-
-            particle.style.left = (x + offsetX) + 'px';
-            particle.style.top = y + 'px';
-
-            document.body.appendChild(particle);
-
-            // Удаляем элемент после анимации
-            setTimeout(() => particle.remove(), 800);
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            p.innerText = '+1';
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
         }
 
         function checkProgress() {
-            // Берем текущую цель
-            let target = levels[currentLevel] ? levels[currentLevel].limit : 1000000;
-            let prevTarget = levels[currentLevel-1] ? levels[currentLevel-1].limit : 0;
-
-            // Расчет полоски (математика, чтобы она плавно росла)
-            let range = target - prevTarget;
-            let currentProgress = score - prevTarget;
-            let percent = (currentProgress / range) * 100;
+            let limit = levels[level] ? levels[level].limit : 10000;
+            let prevLimit = levels[level-1] ? levels[level-1].limit : 0;
+            let percent = ((score - prevLimit) / (limit - prevLimit)) * 100;
 
             if (percent > 100) percent = 100;
             progressEl.style.width = percent + "%";
 
-            // ЭВОЛЮЦИЯ!
-            if (score >= target && levels[currentLevel]) {
-                evolve(levels[currentLevel]);
-                currentLevel++;
+            if (score >= limit && levels[level]) {
+                level++;
+                pet.innerText = levels[level-1].char;
+                rankEl.innerText = "Level " + level + ": " + levels[level-1].name;
             }
         }
-
-        function evolve(nextStage) {
-            // Эффект превращения
-            pet.style.transform = "scale(0) rotate(360deg)"; // Исчезает
-
-            setTimeout(() => {
-                pet.innerText = nextStage.char; // Меняем скин
-                rankEl.innerText = "Level " + (currentLevel + 1) + ": " + nextStage.name;
-                pet.style.transform = "scale(1.2) rotate(0deg)"; // Появляется красиво
-
-                // Сильная вибрация при успехе
-                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-
-                setTimeout(() => pet.style.transform = "scale(1)", 200);
-            }, 200);
-        }
-
-        // Инициализация при старте
-        rankEl.innerText = "Level 1: " + levels[0].name;
     </script>
 </body>
 </html>
