@@ -3,403 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIVIL WAR</title>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>ONLYBROKERS EMPIRE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #ffaa00;
-            --bg: #050505;
-            --panel: #111;
-            --green: #00ff41;
-            --red: #ff3333;
+            --gold: #FFD700;
+            --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
+            --dark: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --green: #2ecc71;
+            --neon-blue: #0088cc; /* Telegram Color */
         }
 
-        /* Сброс стилей для мобилок */
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: manipulation; }
 
         body {
-            background-color: var(--bg);
+            background-color: var(--dark);
             color: #fff;
-            font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Inter', sans-serif;
+            margin: 0; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* ФОН */
-        .scanlines {
+        /* ДИНАМИЧЕСКИЙ ФОН */
+        .bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            pointer-events: none; z-index: 1; opacity: 0.6;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            z-index: -2; transition: all 1s;
         }
-
-        .map-bg {
+        /* Сетка для стиля "Матрица/Блокчейн" */
+        .grid-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(#222 1px, transparent 1px);
-            background-size: 20px 20px;
-            z-index: -1; opacity: 0.3;
+            background-image: linear-gradient(rgba(255, 215, 0, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 215, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1;
         }
 
-        /* ЭКРАНЫ */
-        .screen {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            position: relative;
-            z-index: 10;
-        }
-        .screen.active { display: flex; animation: fade 0.3s; }
-        @keyframes fade { from {opacity:0} to {opacity:1} }
-
-        /* ВЫБОР ШТАТА */
-        .state-list { width: 100%; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-        .state-card {
-            background: #111; border: 1px solid #333;
-            padding: 20px; margin-bottom: 10px; border-radius: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer;
-        }
-        .state-card:active { background: #222; border-color: var(--primary); }
-        .state-name { font-family: 'Black Ops One', sans-serif; font-size: 20px; color: var(--primary); }
-        .state-icon { font-size: 30px; }
-
-        /* ИГРОВОЙ ЭКРАН */
+        /* ХЕДЕР (БАЛАНС) */
         .header {
-            width: 100%; padding: 10px 20px;
-            display: flex; justify-content: space-between; align-items: flex-end;
-            background: rgba(0,0,0,0.8); border-bottom: 1px solid #333;
+            padding: 20px; text-align: center; z-index: 10;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
         }
-        .my-state { font-family: 'Black Ops One', sans-serif; font-size: 24px; color: #fff; text-shadow: 0 0 10px var(--primary); }
-        #balance { font-size: 30px; font-weight: bold; color: var(--primary); }
-
-        /* РАНГИ */
-        .rank-bar { width: 100%; height: 4px; background: #222; position: relative; }
-        .rank-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
-        .rank-text { width: 100%; text-align: center; font-size: 10px; padding: 2px; color: #888; background: #000; }
-
-        /* КНОПКА (РАДАР) */
-        .war-area {
-            flex: 1; display: flex; align-items: center; justify-content: center; width: 100%;
-            position: relative;
+        .net-worth-label { font-size: 10px; text-transform: uppercase; letter-spacing: 3px; color: #888; margin-bottom: 5px; }
+        #balance {
+            font-family: 'Cinzel', serif; font-size: 42px;
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
         }
+        .passive-income { font-size: 12px; color: var(--green); margin-top: 5px; font-weight: 600; }
 
-        .radar-btn {
-            width: 260px; height: 260px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #222 0%, #000 70%);
-            border: 3px solid var(--primary);
-            box-shadow: 0 0 30px rgba(255, 170, 0, 0.2);
-            position: relative;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: transform 0.05s;
-        }
-
-        .radar-btn.hit { transform: scale(0.95); background: #332200; border-color: #fff; }
-
-        /* Сканер */
-        .scanner {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 170, 0, 0.2) 60deg, transparent 60deg);
-            animation: spin 2s linear infinite; pointer-events: none;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* Текст внутри кнопки */
-        .btn-content { pointer-events: none; text-align: center; z-index: 5; }
-        .btn-title { font-family: 'Black Ops One'; font-size: 24px; color: #fff; }
-        .btn-sub { font-size: 10px; color: var(--primary); letter-spacing: 2px; margin-top: 5px; }
-
-        /* ГЛАВНЫЙ СЛОЙ КЛИКА */
-        .click-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; cursor: pointer; border-radius: 50%;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* ЭНЕРГИЯ */
-        .energy-box { width: 80%; text-align: right; margin-bottom: 20px; }
-        .energy-track { width: 100%; height: 6px; background: #222; border: 1px solid #333; margin-top: 5px; }
-        .energy-fill { height: 100%; background: var(--primary); width: 100%; }
-
-        /* МЕНЮ */
-        .nav {
-            height: 70px; background: #080808; border-top: 1px solid #333;
-            display: flex; width: 100%; padding-bottom: env(safe-area-inset-bottom);
-        }
-        .nav-item {
+        /* ГЛАВНАЯ СЦЕНА (ПЕРСОНАЖ) */
+        .main-stage {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0.5; font-size: 10px; cursor: pointer;
+            position: relative; z-index: 5;
         }
-        .nav-item.active { opacity: 1; color: var(--primary); text-shadow: 0 0 5px var(--primary); }
-        .nav-icon { font-size: 24px; margin-bottom: 4px; }
 
-        /* ВСПЛЫВАЮЩИЕ ЦИФРЫ */
+        /* Карточка героя (Стекломорфизм) */
+        .hero-card {
+            width: 300px; height: 380px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: transform 0.1s, box-shadow 0.3s;
+            position: relative; overflow: hidden;
+        }
+
+        .hero-card:active { transform: scale(0.98); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        /* Иконка уровня (Качественная) */
+        .level-icon { font-size: 100px; margin-top: 30px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.2)); transition: 0.3s; }
+
+        .level-info { text-align: center; width: 100%; }
+        .level-name { font-family: 'Cinzel', serif; font-size: 24px; color: #fff; margin-bottom: 5px; }
+        .tap-power { font-size: 12px; color: #aaa; letter-spacing: 1px; }
+
+        /* Прогресс бар внутри карточки */
+        .progress-container { width: 100%; margin-top: 15px; }
+        .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--gold-gradient); width: 0%; transition: width 0.3s; box-shadow: 0 0 10px var(--gold); }
+        .next-level-text { font-size: 10px; color: #666; margin-top: 5px; display: flex; justify-content: space-between; }
+
+        /* Зона клика (прозрачная) */
+        .click-trigger { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 100; cursor: pointer; }
+
+        /* ПАНЕЛЬ АКТИВОВ (ПАССИВНЫЙ ДОХОД) */
+        .assets-panel {
+            height: 220px; background: #111; border-top: 1px solid #333;
+            padding: 15px; display: flex; flex-direction: column;
+            z-index: 20; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+        .panel-title { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+        .assets-list {
+            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;
+        }
+        .assets-list::-webkit-scrollbar { display: none; }
+
+        /* Карточка актива */
+        .asset-card {
+            min-width: 130px; height: 140px;
+            background: #1a1a1a; border: 1px solid #333; border-radius: 12px;
+            padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
+            transition: 0.2s; position: relative;
+        }
+        .asset-card.locked { opacity: 0.5; filter: grayscale(1); }
+        .asset-card.can-buy { border-color: var(--green); cursor: pointer; background: linear-gradient(180deg, #1a1a1a 0%, #0d2613 100%); }
+        .asset-card:active { transform: scale(0.95); }
+
+        .asset-icon { font-size: 24px; }
+        .asset-name { font-size: 12px; font-weight: 700; margin-top: 5px; color: #fff; }
+        .asset-profit { font-size: 10px; color: var(--green); }
+        .asset-cost { font-size: 12px; font-weight: 700; color: var(--gold); margin-top: auto; }
+        .asset-count {
+            position: absolute; top: 5px; right: 5px;
+            background: #333; font-size: 10px; padding: 2px 6px; border-radius: 4px; color: #fff;
+        }
+
+        /* СПЕЦЭФФЕКТЫ */
         .float-text {
-            position: absolute; font-family: 'Black Ops One'; font-size: 32px; color: #fff;
-            pointer-events: none; z-index: 999; animation: floatUp 0.6s ease-out forwards;
-            text-shadow: 2px 2px 0px #000;
+            position: absolute; font-weight: 900; font-size: 28px; color: #fff;
+            pointer-events: none; z-index: 200; animation: floatUp 0.8s forwards;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
         @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
-
-        /* ИНТЕЛ СТРАНИЦА */
-        .intel-box { width: 90%; background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border: 1px solid #333; }
-        .intel-bar { height: 4px; background: var(--red); width: 50%; margin-top: 5px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% {opacity:0.6;} 50% {opacity:1;} 100% {opacity:0.6;} }
 
     </style>
 </head>
 <body>
 
-    <div class="scanlines"></div>
-    <div class="map-bg"></div>
+    <div class="bg-layer" id="bgLayer"></div>
+    <div class="grid-layer"></div>
 
-    <div id="screen-select" class="screen active">
-        <h2 style="margin-top: 50px; font-family: 'Black Ops One'; font-size: 28px; text-align: center; color: var(--primary);">CHOOSE YOUR<br>ALLEGIANCE</h2>
-        <div class="state-list">
-            <div class="state-card" onclick="pickState('TEXAS')">
-                <div class="state-icon">🤠</div>
-                <div class="state-name">TEXAS</div>
-            </div>
-            <div class="state-card" onclick="pickState('CALIFORNIA')">
-                <div class="state-icon">🌴</div>
-                <div class="state-name">CALIFORNIA</div>
-            </div>
-            <div class="state-card" onclick="pickState('NEW YORK')">
-                <div class="state-icon">🗽</div>
-                <div class="state-name">NEW YORK</div>
-            </div>
-            <div class="state-card" onclick="pickState('FLORIDA')">
-                <div class="state-icon">🐊</div>
-                <div class="state-name">FLORIDA</div>
-            </div>
-            <div class="state-card" onclick="pickState('OHIO')">
-                <div class="state-icon">💀</div>
-                <div class="state-name">OHIO</div>
-            </div>
-        </div>
+    <div class="header">
+        <div class="net-worth-label">Total Net Worth</div>
+        <div id="balance">$0</div>
+        <div class="passive-income" id="passiveDisplay">+$0 / sec</div>
     </div>
 
-    <div id="screen-game" class="screen">
-        <div class="rank-text" id="rankName">RANK: PRIVATE</div>
-        <div class="rank-bar"><div class="rank-fill" id="rankFill"></div></div>
+    <div class="main-stage">
+        <div class="hero-card" id="heroCard">
+            <div class="level-icon" id="heroIcon">📦</div>
 
-        <div class="header">
-            <div>
-                <div style="font-size: 10px; color: #888;">DEFENDING</div>
-                <div class="my-state" id="displayState">TEXAS</div>
+            <div class="level-info">
+                <div class="level-name" id="levelName">Homeless</div>
+                <div class="tap-power" id="tapPower">Tap Power: $1</div>
             </div>
-            <div style="text-align: right;">
-                <div style="font-size: 10px; color: #888;">WAR CHEST</div>
-                <div id="balance">$0</div>
-            </div>
-        </div>
 
-        <div class="war-area">
-            <div class="radar-btn" id="radarBtn">
-                <div class="scanner"></div>
-                <div class="btn-content">
-                    <div class="btn-title">ATTACK</div>
-                    <div class="btn-sub">NEIGHBORS</div>
+            <div class="progress-container">
+                <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+                <div class="next-level-text">
+                    <span id="nextLevelName">Next: Intern</span>
+                    <span id="nextLevelCost">$500</span>
                 </div>
             </div>
-            <div class="click-layer" id="trigger"></div>
-        </div>
 
-        <div class="energy-box">
-            <div style="font-size: 10px;" id="energyText">POWER: 1000</div>
-            <div class="energy-track"><div class="energy-fill" id="energyFill"></div></div>
+            <div class="click-trigger" id="clickBtn"></div>
         </div>
     </div>
 
-    <div id="screen-intel" class="screen">
-        <h2 style="font-family: 'Black Ops One'; margin-top: 40px;">LIVE WAR INTEL</h2>
-        <div class="intel-box">
-            <div style="display:flex; justify-content:space-between;">
-                <strong>CALIFORNIA</strong> <span style="color:var(--red)">ATTACKING</span>
+    <div class="assets-panel">
+        <div class="panel-title">Investments & Assets (Passive Income)</div>
+        <div class="assets-list" id="assetsContainer">
             </div>
-            <div class="intel-bar" style="width: 70%"></div>
-        </div>
-        <div class="intel-box">
-            <div style="display:flex; justify-content:space-between;">
-                <strong>TEXAS</strong> <span style="color:var(--primary)">DEFENDING</span>
-            </div>
-            <div class="intel-bar" style="width: 65%; background: var(--primary);"></div>
-        </div>
-        <div class="intel-box">
-            <div style="display:flex; justify-content:space-between;">
-                <strong>NEW YORK</strong> <span style="color:#666">OFFLINE</span>
-            </div>
-            <div class="intel-bar" style="width: 30%; background: #444;"></div>
-        </div>
-    </div>
-
-    <div id="screen-crew" class="screen">
-        <h2 style="font-family: 'Black Ops One'; margin-top: 50px;">RECRUITMENT</h2>
-        <div style="text-align: center; width: 80%; color: #aaa; font-size: 12px; margin-bottom: 30px;">
-            We need more soldiers.<br>Share your link to recruit reinforcements.
-        </div>
-        <div style="font-size: 50px; margin-bottom: 20px;">🪖</div>
-        <button onclick="copyLink()" style="background: var(--primary); border: none; padding: 15px 40px; font-weight: bold; font-family: inherit; font-size: 16px; clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);">COPY LINK</button>
-        <div id="toast" style="opacity:0; margin-top:10px; font-size:10px; color:var(--primary); transition:0.3s;">COPIED!</div>
-    </div>
-
-    <div class="nav">
-        <div class="nav-item active" onclick="go('game', this)"><span class="nav-icon">⚔️</span>WAR</div>
-        <div class="nav-item" onclick="go('intel', this)"><span class="nav-icon">📡</span>INTEL</div>
-        <div class="nav-item" onclick="go('crew', this)"><span class="nav-icon">🪖</span>CREW</div>
     </div>
 
     <script>
-        // ДАННЫЕ
-        let myState = localStorage.getItem('state_war_id');
-        let balance = parseInt(localStorage.getItem('state_war_bal') || '0');
-        let energy = 1000;
+        // --- ДАННЫЕ ИГРЫ ---
+        let game = {
+            balance: 0,
+            level: 0,
+            assets: [0, 0, 0, 0, 0] // Количество купленных ассетов
+        };
 
-        // РАНГИ
-        const RANKS = [
-            {n:"PRIVATE", v:0}, {n:"CORPORAL", v:5000}, {n:"SERGEANT", v:15000},
-            {n:"CAPTAIN", v:50000}, {n:"MAJOR", v:150000}, {n:"GENERAL", v:500000},
-            {n:"PRESIDENT", v:10000000}
+        // --- КОНФИГУРАЦИЯ ---
+        // Уровни героя (от Бомжа до Владельца Мира)
+        const LEVELS = [
+            { name: "Broke", cost: 0, icon: "📦", tap: 1, bg: "#1a1a1a" },
+            { name: "Intern", cost: 500, icon: "🧹", tap: 5, bg: "#2c3e50" },
+            { name: "Freelancer", cost: 2500, icon: "💻", tap: 15, bg: "#27ae60" },
+            { name: "Broker", cost: 10000, icon: "👔", tap: 50, bg: "#8e44ad" },
+            { name: "CEO", cost: 100000, icon: "🚗", tap: 200, bg: "#c0392b" },
+            { name: "Tycoon", cost: 1000000, icon: "🚁", tap: 1000, bg: "#f39c12" },
+            { name: "Illuminati", cost: 50000000, icon: "👁️", tap: 10000, bg: "#000" }
         ];
 
-        // ВОССТАНОВЛЕНИЕ
-        if (localStorage.getItem('state_war_time')) {
-            let diff = (Date.now() - parseInt(localStorage.getItem('state_war_time'))) / 1000;
-            let savedEng = parseInt(localStorage.getItem('state_war_eng') || '1000');
-            energy = Math.min(1000, savedEng + Math.floor(diff * 5));
-        }
+        // Активы (Пассивный доход) - СВЯЗЬ С ТЕЛЕГРАМ
+        const ASSETS = [
+            { name: "Online Course", cost: 1000, earn: 5, icon: "📚" },
+            { name: "Real Estate", cost: 5000, earn: 30, icon: "🏠" },
+            { name: "Telegram Channel", cost: 20000, earn: 150, icon: "📢" }, // Пропаганда ТГ
+            { name: "TON Validator", cost: 100000, earn: 800, icon: "💎" }, // Пропаганда Крипты
+            { name: "OnlyBrokers Franchise", cost: 1000000, earn: 5000, icon: "🏢" }
+        ];
 
-        // ЭЛЕМЕНТЫ
+        // UI ССЫЛКИ
         const balEl = document.getElementById('balance');
-        const engFill = document.getElementById('energyFill');
-        const engTxt = document.getElementById('energyText');
-        const trigger = document.getElementById('trigger');
-        const radar = document.getElementById('radarBtn');
-        const rankName = document.getElementById('rankName');
-        const rankFill = document.getElementById('rankFill');
+        const passEl = document.getElementById('passiveDisplay');
+        const iconEl = document.getElementById('heroIcon');
+        const nameEl = document.getElementById('levelName');
+        const powEl = document.getElementById('tapPower');
+        const nextNameEl = document.getElementById('nextLevelName');
+        const nextCostEl = document.getElementById('nextLevelCost');
+        const progFill = document.getElementById('progFill');
+        const clickBtn = document.getElementById('clickBtn');
+        const heroCard = document.getElementById('heroCard');
+        const bgLayer = document.getElementById('bgLayer');
+        const assetsCont = document.getElementById('assetsContainer');
 
-        // СТАРТ
-        if (myState) startGame();
+        // ЗАГРУЗКА
+        loadGame();
+        renderAssets();
+        updateUI();
 
-        function pickState(name) {
-            myState = name;
-            localStorage.setItem('state_war_id', name);
-            startGame();
-        }
-
-        function startGame() {
-            document.getElementById('screen-select').classList.remove('active');
-            document.getElementById('screen-game').classList.add('active');
-            document.getElementById('displayState').innerText = myState;
-            updateUI();
-        }
-
-        // --- ГЛАВНЫЙ КЛИКЕР ---
-        trigger.addEventListener('pointerdown', function(e) {
-            e.preventDefault(); // Стоп зум
-
-            if (energy < 10) {
-                if(navigator.vibrate) navigator.vibrate(50);
-                return;
+        // --- АВТО-ДОХОД (LOOP) ---
+        setInterval(() => {
+            let passive = calcPassive();
+            if (passive > 0) {
+                game.balance += passive;
+                updateUI();
+                saveGame();
             }
+        }, 1000);
 
-            // Анимация кнопки
-            radar.classList.add('hit');
-            setTimeout(() => radar.classList.remove('hit'), 100);
+        // --- КЛИКЕР ---
+        clickBtn.addEventListener('pointerdown', (e) => {
+            e.preventDefault(); // Анти-зум
 
-            // Вибрация
+            // Визуал
+            heroCard.style.transform = "scale(0.97)";
+            setTimeout(() => heroCard.style.transform = "scale(1)", 100);
             if(navigator.vibrate) navigator.vibrate(15);
 
             // Логика
-            let gain = Math.floor(Math.random() * 8) + 4;
-            let crit = Math.random() > 0.97;
-            if(crit) { gain = 100; if(navigator.vibrate) navigator.vibrate([30,30]); }
+            let gain = LEVELS[game.level].tap;
+            game.balance += gain;
 
-            balance += gain;
-            energy -= 10;
+            // Проверка на повышение уровня
+            checkLevelUp();
 
-            save();
             updateUI();
 
-            // Цифры
+            // Вылетающий текст
             let x = e.clientX || window.innerWidth/2;
             let y = e.clientY || window.innerHeight/2;
-            spawnFloat(x, y, gain, crit);
+            spawnFloat(x, y, gain);
         });
 
-        function spawnFloat(x, y, val, crit) {
+        function checkLevelUp() {
+            let nextLvl = LEVELS[game.level + 1];
+            if (nextLvl && game.balance >= nextLvl.cost) {
+                game.balance -= nextLvl.cost;
+                game.level++;
+                if(navigator.vibrate) navigator.vibrate([50,50,50]); // Вибрация успеха
+                // Смена фона
+                bgLayer.style.background = radial-gradient(circle at center, ${LEVELS[game.level].bg} 0%, #000 100%);
+                saveGame();
+            }
+        }
+
+        // --- ПОКУПКА АКТИВОВ ---
+        window.buyAsset = function(index) {
+            let asset = ASSETS[index];
+            // Цена растет с каждой покупкой (коэф 1.2)
+            let price = Math.floor(asset.cost * Math.pow(1.15, game.assets[index]));
+
+            if (game.balance >= price) {
+                game.balance -= price;
+                game.assets[index]++;
+                if(navigator.vibrate) navigator.vibrate(20);
+                saveGame();
+                updateUI();
+                renderAssets(); // Перерисовать цены
+            }
+        }
+
+        // --- РЕНДЕР UI ---
+        function updateUI() {
+            balEl.innerText = "$" + game.balance.toLocaleString();
+
+            let curLvl = LEVELS[game.level];
+            let nextLvl = LEVELS[game.level + 1];
+
+            iconEl.innerText = curLvl.icon;
+            nameEl.innerText = curLvl.name;
+            powEl.innerText = "Active Income: $" + curLvl.tap + "/click";
+            passEl.innerText = "Passive Income: +$" + calcPassive().toLocaleString() + "/sec";
+
+            // Прогресс бар
+            if (nextLvl) {
+                let percent = (game.balance / nextLvl.cost) * 100;
+                if (percent > 100) percent = 100;
+                progFill.style.width = percent + "%";
+                nextNameEl.innerText = "Next: " + nextLvl.name;
+                nextCostEl.innerText = "Need: $" + nextLvl.cost.toLocaleString();
+            } else {
+                progFill.style.width = "100%";
+                nextNameEl.innerText = "WORLD DOMINATION";
+                nextCostEl.innerText = "";
+            }
+
+            // Обновление доступности кнопок активов
+            updateAssetsState();
+        }
+
+        function renderAssets() {
+            assetsCont.innerHTML = "";
+            ASSETS.forEach((asset, index) => {
+                let count = game.assets[index];
+                let price = Math.floor(asset.cost * Math.pow(1.15, count));
+
+                let el = document.createElement('div');
+                el.className = "asset-card locked";
+                el.id = "asset-" + index;
+                el.onclick = () => buyAsset(index);
+
+                el.innerHTML = `
+                    <div class="asset-count">${count}</div>
+                    <div class="asset-icon">${asset.icon}</div>
+                    <div>
+                        <div class="asset-name">${asset.name}</div>
+                        <div class="asset-profit">+$${asset.earn}/s</div>
+                    </div>
+                    <div class="asset-cost">$${price.toLocaleString()}</div>
+                `;
+                assetsCont.appendChild(el);
+            });
+            updateAssetsState();
+        }
+
+        function updateAssetsState() {
+            ASSETS.forEach((asset, index) => {
+                let count = game.assets[index];
+                let price = Math.floor(asset.cost * Math.pow(1.15, count));
+                let el = document.getElementById("asset-" + index);
+
+                if (game.balance >= price) {
+                    el.className = "asset-card can-buy";
+                } else {
+                    el.className = "asset-card locked";
+                }
+            });
+        }
+
+        function calcPassive() {
+            let total = 0;
+            ASSETS.forEach((a, i) => {
+                total += a.earn * game.assets[i];
+            });
+            return total;
+        }
+
+        function spawnFloat(x, y, val) {
             const el = document.createElement('div');
             el.className = 'float-text';
             el.innerText = "+$" + val;
-            if(crit) { el.style.color = "#fff"; el.style.fontSize = "40px"; }
-
-            let rx = (Math.random() - 0.5) * 40;
-            el.style.left = (x + rx - 20) + 'px';
-            el.style.top = (y - 50) + 'px';
+            el.style.left = (x - 20) + 'px';
+            el.style.top = (y - 80) + 'px'; // Чуть выше клика
             document.body.appendChild(el);
-            setTimeout(() => el.remove(), 600);
+            setTimeout(() => el.remove(), 800);
         }
 
-        function updateUI() {
-            balEl.innerText = "$" + balance.toLocaleString();
-            engFill.style.width = (energy / 1000 * 100) + "%";
-            engTxt.innerText = "POWER: " + Math.floor(energy);
+        // --- СОХРАНЕНИЕ ---
+        function saveGame() {
+            localStorage.setItem('empire_save', JSON.stringify(game));
+        }
 
-            // Ранг
-            let r = RANKS[0];
-            let next = RANKS[1];
-            for(let i=0; i<RANKS.length; i++) {
-                if(balance >= RANKS[i].v) { r = RANKS[i]; next = RANKS[i+1] || RANKS[i]; }
-            }
-            rankName.innerText = "RANK: " + r.n;
-
-            if (r.n === "PRESIDENT") rankFill.style.width = "100%";
-            else {
-                let range = next.v - r.v;
-                let prog = balance - r.v;
-                rankFill.style.width = ((prog/range)*100) + "%";
+        function loadGame() {
+            let saved = localStorage.getItem('empire_save');
+            if (saved) {
+                game = JSON.parse(saved);
+                // Проверка на целостность массива ассетов
+                if(!game.assets) game.assets = [0,0,0,0,0];
             }
         }
-
-        function save() {
-            localStorage.setItem('state_war_bal', balance);
-            localStorage.setItem('state_war_eng', energy);
-            localStorage.setItem('state_war_time', Date.now());
-        }
-
-        // РЕГЕН
-        setInterval(() => {
-            if(energy < 1000) { energy += 5; updateUI(); save(); }
-        }, 1000);
-
-        // НАВИГАЦИЯ
-        window.go = function(id, el) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('screen-' + id).classList.add('active');
-            el.classList.add('active');
-        }
-
-        window.copyLink = function() {
-            const t = document.getElementById('toast');
-            t.style.opacity = 1;
-            setTimeout(() => t.style.opacity = 0, 2000);
-            if(navigator.vibrate) navigator.vibrate(30);
-        }
-
     </script>
 </body>
 </html>
