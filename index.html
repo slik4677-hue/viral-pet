@@ -1,388 +1,791 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ONLYBROKERS EMPIRE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;600;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --gold: #FFD700;
-            --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
-            --dark: #050505;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-            --green: #2ecc71;
-            --neon-blue: #0088cc; /* Telegram Color */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="24 Hour Hustle Challenge - How fast can you make $10,000?">
+<title>24H Hustle Challenge</title>
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: manipulation; }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        body {
-            background-color: var(--dark);
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            margin: 0; height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
 
-        /* ДИНАМИЧЕСКИЙ ФОН */
-        .bg-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-            z-index: -2; transition: all 1s;
-        }
-        /* Сетка для стиля "Матрица/Блокчейн" */
-        .grid-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(255, 215, 0, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 215, 0, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px; z-index: -1;
-        }
+body {
+  background: radial-gradient(ellipse at top, #2d2d2d 0%, #0f0f0f 100%);
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
 
-        /* ХЕДЕР (БАЛАНС) */
-        .header {
-            padding: 20px; text-align: center; z-index: 10;
-            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
-        }
-        .net-worth-label { font-size: 10px; text-transform: uppercase; letter-spacing: 3px; color: #888; margin-bottom: 5px; }
-        #balance {
-            font-family: 'Cinzel', serif; font-size: 42px;
-            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
-        }
-        .passive-income { font-size: 12px; color: var(--green); margin-top: 5px; font-weight: 600; }
+/* Header Section */
+.header {
+  padding: 20px 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+}
 
-        /* ГЛАВНАЯ СЦЕНА (ПЕРСОНАЖ) */
-        .main-stage {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; z-index: 5;
-        }
+.header h1 {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #888;
+  text-transform: uppercase;
+  font-weight: 600;
+}
 
-        /* Карточка героя (Стекломорфизм) */
-        .hero-card {
-            width: 300px; height: 380px;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            padding: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transition: transform 0.1s, box-shadow 0.3s;
-            position: relative; overflow: hidden;
-        }
+.balance {
+  font-size: 48px;
+  font-weight: 800;
+  color: #ffd700;
+  margin-top: 8px;
+  text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+  transition: transform 0.1s;
+}
 
-        .hero-card:active { transform: scale(0.98); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+.balance.pop {
+  transform: scale(1.1);
+}
 
-        /* Иконка уровня (Качественная) */
-        .level-icon { font-size: 100px; margin-top: 30px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.2)); transition: 0.3s; }
+.sub {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+  font-weight: 500;
+}
 
-        .level-info { text-align: center; width: 100%; }
-        .level-name { font-family: 'Cinzel', serif; font-size: 24px; color: #fff; margin-bottom: 5px; }
-        .tap-power { font-size: 12px; color: #aaa; letter-spacing: 1px; }
+.timer {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #ff4757;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
 
-        /* Прогресс бар внутри карточки */
-        .progress-container { width: 100%; margin-top: 15px; }
-        .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--gold-gradient); width: 0%; transition: width 0.3s; box-shadow: 0 0 10px var(--gold); }
-        .next-level-text { font-size: 10px; color: #666; margin-top: 5px; display: flex; justify-content: space-between; }
+.progress-bar {
+  width: 80%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  overflow: hidden;
+}
 
-        /* Зона клика (прозрачная) */
-        .click-trigger { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 100; cursor: pointer; }
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
 
-        /* ПАНЕЛЬ АКТИВОВ (ПАССИВНЫЙ ДОХОД) */
-        .assets-panel {
-            height: 220px; background: #111; border-top: 1px solid #333;
-            padding: 15px; display: flex; flex-direction: column;
-            z-index: 20; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-        }
-        .panel-title { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+/* Main Content */
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
 
-        .assets-list {
-            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;
-        }
-        .assets-list::-webkit-scrollbar { display: none; }
+.card {
+  width: 100%;
+  max-width: 360px;
+  padding: 28px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(40,40,40,0.8) 0%, rgba(20,20,20,0.9) 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
 
-        /* Карточка актива */
-        .asset-card {
-            min-width: 130px; height: 140px;
-            background: #1a1a1a; border: 1px solid #333; border-radius: 12px;
-            padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
-            transition: 0.2s; position: relative;
-        }
-        .asset-card.locked { opacity: 0.5; filter: grayscale(1); }
-        .asset-card.can-buy { border-color: var(--green); cursor: pointer; background: linear-gradient(180deg, #1a1a1a 0%, #0d2613 100%); }
-        .asset-card:active { transform: scale(0.95); }
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
+}
 
-        .asset-icon { font-size: 24px; }
-        .asset-name { font-size: 12px; font-weight: 700; margin-top: 5px; color: #fff; }
-        .asset-profit { font-size: 10px; color: var(--green); }
-        .asset-cost { font-size: 12px; font-weight: 700; color: var(--gold); margin-top: auto; }
-        .asset-count {
-            position: absolute; top: 5px; right: 5px;
-            background: #333; font-size: 10px; padding: 2px 6px; border-radius: 4px; color: #fff;
-        }
+.role {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-        /* СПЕЦЭФФЕКТЫ */
-        .float-text {
-            position: absolute; font-weight: 900; font-size: 28px; color: #fff;
-            pointer-events: none; z-index: 200; animation: floatUp 0.8s forwards;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-        @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
+.goal {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
 
-    </style>
+/* Tap Button */
+.tap-btn {
+  width: 100%;
+  height: 72px;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb800 100%);
+  font-size: 18px;
+  font-weight: 800;
+  color: #000;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #cc8a00, 0 10px 20px rgba(0,0,0,0.3);
+  transition: all 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+
+.tap-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #cc8a00, 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.tap-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s;
+}
+
+.tap-btn:active::after {
+  left: 100%;
+}
+
+.tap-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Floating Text Animation */
+.float-text {
+  position: absolute;
+  color: #ffd700;
+  font-weight: 800;
+  font-size: 20px;
+  pointer-events: none;
+  animation: floatUp 1s ease-out forwards;
+  z-index: 1000;
+}
+
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+}
+
+/* Asset Section */
+.asset-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.asset {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.asset:not(.disabled):hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,215,0,0.3);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.asset.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+.asset.affordable {
+  border-color: rgba(255,215,0,0.5);
+  box-shadow: 0 0 15px rgba(255,215,0,0.1);
+}
+
+.asset-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.asset-sub {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+
+.asset-count {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: rgba(255,215,0,0.2);
+  color: #ffd700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Status Footer */
+.footer {
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  background: rgba(0,0,0,0.2);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-weight: 500;
+}
+
+/* Modals */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: linear-gradient(180deg, #1f1f1f, #151515);
+  padding: 32px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,215,0,0.2);
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #ffd700;
+}
+
+.modal-text {
+  color: #aaa;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.modal-btn {
+  background: linear-gradient(135deg, #ffd700, #ffb800);
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 800;
+  color: #000;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  box-shadow: 0 4px 0 #cc8a00;
+  transition: transform 0.1s;
+}
+
+.modal-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #cc8a00;
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  animation: confetti-fall 3s ease-out forwards;
+  z-index: 3000;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.stat-box {
+  background: rgba(0,0,0,0.3);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-height: 700px) {
+  .card { padding: 20px; }
+  .balance { font-size: 36px; }
+  .tap-btn { height: 60px; }
+}
+</style>
 </head>
+
 <body>
 
-    <div class="bg-layer" id="bgLayer"></div>
-    <div class="grid-layer"></div>
+<div class="header">
+  <h1>24H Hustle Challenge</h1>
+  <div class="balance" id="balance">$0</div>
+  <div class="sub" id="pps">+$0 / sec</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+  </div>
+  <div class="timer" id="timer">24h 0m remaining</div>
+</div>
 
-    <div class="header">
-        <div class="net-worth-label">Total Net Worth</div>
-        <div id="balance">$0</div>
-        <div class="passive-income" id="passiveDisplay">+$0 / sec</div>
+<div class="main">
+  <div class="card" id="gameCard">
+    <div class="role" id="role">Nobody</div>
+    <div class="goal">Goal: $10,000 in 24 hours</div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">Assets</div>
+        <div class="stat-value" id="assetCount">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Taps</div>
+        <div class="stat-value" id="tapCount">0</div>
+      </div>
     </div>
 
-    <div class="main-stage">
-        <div class="hero-card" id="heroCard">
-            <div class="level-icon" id="heroIcon">📦</div>
+    <button class="tap-btn" id="tapBtn">EARN $5</button>
 
-            <div class="level-info">
-                <div class="level-name" id="levelName">Homeless</div>
-                <div class="tap-power" id="tapPower">Tap Power: $1</div>
-            </div>
-
-            <div class="progress-container">
-                <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
-                <div class="next-level-text">
-                    <span id="nextLevelName">Next: Intern</span>
-                    <span id="nextLevelCost">$500</span>
-                </div>
-            </div>
-
-            <div class="click-trigger" id="clickBtn"></div>
-        </div>
+    <div class="asset-section">
+      <div class="asset" id="assetBtn">
+        <div class="asset-count" id="ownedCount">0</div>
+        <div class="asset-title">💼 Side Hustle</div>
+        <div class="asset-sub" id="assetInfo">$200 → +$2/sec</div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="assets-panel">
-        <div class="panel-title">Investments & Assets (Passive Income)</div>
-        <div class="assets-list" id="assetsContainer">
-            </div>
-    </div>
+<div class="footer" id="status">Start hustling!</div>
 
-    <script>
-        // --- ДАННЫЕ ИГРЫ ---
-        let game = {
-            balance: 0,
-            level: 0,
-            assets: [0, 0, 0, 0, 0] // Количество купленных ассетов
-        };
+<!-- Game Over Modal -->
+<div class="modal" id="gameOverModal">
+  <div class="modal-content">
+    <div class="modal-title" id="modalTitle">Challenge Complete!</div>
+    <div class="modal-text" id="modalText">You made $10,000!</div>
+    <button class="modal-btn" id="restartBtn">Play Again</button>
+  </div>
+</div>
 
-        // --- КОНФИГУРАЦИЯ ---
-        // Уровни героя (от Бомжа до Владельца Мира)
-        const LEVELS = [
-            { name: "Broke", cost: 0, icon: "📦", tap: 1, bg: "#1a1a1a" },
-            { name: "Intern", cost: 500, icon: "🧹", tap: 5, bg: "#2c3e50" },
-            { name: "Freelancer", cost: 2500, icon: "💻", tap: 15, bg: "#27ae60" },
-            { name: "Broker", cost: 10000, icon: "👔", tap: 50, bg: "#8e44ad" },
-            { name: "CEO", cost: 100000, icon: "🚗", tap: 200, bg: "#c0392b" },
-            { name: "Tycoon", cost: 1000000, icon: "🚁", tap: 1000, bg: "#f39c12" },
-            { name: "Illuminati", cost: 50000000, icon: "👁️", tap: 10000, bg: "#000" }
-        ];
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
 
-        // Активы (Пассивный доход) - СВЯЗЬ С ТЕЛЕГРАМ
-        const ASSETS = [
-            { name: "Online Course", cost: 1000, earn: 5, icon: "📚" },
-            { name: "Real Estate", cost: 5000, earn: 30, icon: "🏠" },
-            { name: "Telegram Channel", cost: 20000, earn: 150, icon: "📢" }, // Пропаганда ТГ
-            { name: "TON Validator", cost: 100000, earn: 800, icon: "💎" }, // Пропаганда Крипты
-            { name: "OnlyBrokers Franchise", cost: 1000000, earn: 5000, icon: "🏢" }
-        ];
+// Game Constants
+const GOAL = 10000;
+const DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const TAP_VALUE = 5;
+const BASE_ASSET_PRICE = 200;
+const ASSET_INCOME = 2;
+const PRICE_MULTIPLIER = 1.4;
 
-        // UI ССЫЛКИ
-        const balEl = document.getElementById('balance');
-        const passEl = document.getElementById('passiveDisplay');
-        const iconEl = document.getElementById('heroIcon');
-        const nameEl = document.getElementById('levelName');
-        const powEl = document.getElementById('tapPower');
-        const nextNameEl = document.getElementById('nextLevelName');
-        const nextCostEl = document.getElementById('nextLevelCost');
-        const progFill = document.getElementById('progFill');
-        const clickBtn = document.getElementById('clickBtn');
-        const heroCard = document.getElementById('heroCard');
-        const bgLayer = document.getElementById('bgLayer');
-        const assetsCont = document.getElementById('assetsContainer');
+// User ID
+let userId = "guest";
+if (tg.initDataUnsafe?.user?.id) {
+  userId = tg.initDataUnsafe.user.id;
+} else if (tg.initDataUnsafe?.user?.username) {
+  userId = tg.initDataUnsafe.user.username;
+}
 
-        // ЗАГРУЗКА
-        loadGame();
-        renderAssets();
-        updateUI();
+const KEY = "hustle_v2_" + userId;
 
-        // --- АВТО-ДОХОД (LOOP) ---
-        setInterval(() => {
-            let passive = calcPassive();
-            if (passive > 0) {
-                game.balance += passive;
-                updateUI();
-                saveGame();
-            }
-        }, 1000);
+// Game State
+let game = {
+  balance: 0,
+  income: 0,
+  assets: 0,
+  taps: 0,
+  startTime: null,
+  completed: false,
+  won: false
+};
 
-        // --- КЛИКЕР ---
-        clickBtn.addEventListener('pointerdown', (e) => {
-            e.preventDefault(); // Анти-зум
+// DOM Elements
+const balanceEl = document.getElementById("balance");
+const ppsEl = document.getElementById("pps");
+const roleEl = document.getElementById("role");
+const timerEl = document.getElementById("timer");
+const assetInfo = document.getElementById("assetInfo");
+const assetBtn = document.getElementById("assetBtn");
+const statusEl = document.getElementById("status");
+const progressBar = document.getElementById("progressBar");
+const assetCountEl = document.getElementById("assetCount");
+const tapCountEl = document.getElementById("tapCount");
+const ownedCountEl = document.getElementById("ownedCount");
+const tapBtn = document.getElementById("tapBtn");
+const gameOverModal = document.getElementById("gameOverModal");
+const modalTitle = document.getElementById("modalTitle");
+const modalText = document.getElementById("modalText");
+const restartBtn = document.getElementById("restartBtn");
 
-            // Визуал
-            heroCard.style.transform = "scale(0.97)";
-            setTimeout(() => heroCard.style.transform = "scale(1)", 100);
-            if(navigator.vibrate) navigator.vibrate(15);
+// Save Debounce
+let saveTimeout;
+function debouncedSave() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(game));
+    } catch (e) {
+      console.error("Save failed:", e);
+    }
+  }, 300);
+}
 
-            // Логика
-            let gain = LEVELS[game.level].tap;
-            game.balance += gain;
+// Calculations
+function getAssetPrice() {
+  return Math.floor(BASE_ASSET_PRICE * Math.pow(PRICE_MULTIPLIER, game.assets));
+}
 
-            // Проверка на повышение уровня
-            checkLevelUp();
+function getRole() {
+  const b = game.balance;
+  if (b >= GOAL) return "🏆 Winner";
+  if (b >= 8000) return "💎 Tycoon";
+  if (b >= 5000) return "📈 Investor";
+  if (b >= 2500) return "💼 Entrepreneur";
+  if (b >= 1000) return "🔥 Hustler";
+  if (b >= 500) return "📊 Trader";
+  if (b >= 100) return "🌱 Starter";
+  return "😴 Nobody";
+}
 
-            updateUI();
+function getTimeLeft() {
+  if (!game.startTime) return DURATION;
+  return Math.max(0, DURATION - (Date.now() - game.startTime));
+}
 
-            // Вылетающий текст
-            let x = e.clientX || window.innerWidth/2;
-            let y = e.clientY || window.innerHeight/2;
-            spawnFloat(x, y, gain);
-        });
+function formatMoney(amount) {
+  return "$" + Math.floor(amount).toLocaleString();
+}
 
-        function checkLevelUp() {
-            let nextLvl = LEVELS[game.level + 1];
-            if (nextLvl && game.balance >= nextLvl.cost) {
-                game.balance -= nextLvl.cost;
-                game.level++;
-                if(navigator.vibrate) navigator.vibrate([50,50,50]); // Вибрация успеха
-                // Смена фона
-                bgLayer.style.background = radial-gradient(circle at center, ${LEVELS[game.level].bg} 0%, #000 100%);
-                saveGame();
-            }
+function formatTime(ms) {
+  if (ms <= 0) return "Time's up!";
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  if (h > 0) return `${h}h ${m}m remaining`;
+  return `${m}m ${s}s remaining`;
+}
+
+// Visual Effects
+function showFloatingText(x, y, text, color = "#ffd700") {
+  const el = document.createElement("div");
+  el.className = "float-text";
+  el.textContent = text;
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+  el.style.color = color;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function animateBalance() {
+  balanceEl.classList.add("pop");
+  setTimeout(() => balanceEl.classList.remove("pop"), 100);
+}
+
+function createConfetti() {
+  const colors = ["#ffd700", "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti";
+      confetti.style.left = Math.random() * 100 + "vw";
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 4000);
+    }, i * 30);
+  }
+}
+
+function haptic(type = "light") {
+  if (tg.HapticFeedback) {
+    tg.HapticFeedback.impactOccurred(type);
+  }
+}
+
+// Game Logic
+function checkGameEnd() {
+  const timeLeft = getTimeLeft();
+
+  if (game.balance >= GOAL && !game.won) {
+    game.won = true;
+    game.completed = true;
+    endGame(true);
+    return true;
+  }
+
+  if (timeLeft <= 0 && !game.completed) {
+    game.completed = true;
+    endGame(false);
+    return true;
+  }
+
+  return false;
+}
+
+function endGame(won) {
+  if (won) {
+    modalTitle.textContent = "🎉 Challenge Complete!";
+    modalText.textContent = `You made ${formatMoney(game.balance)} in ${formatTime(DURATION - getTimeLeft())}!`;
+    modalTitle.style.color = "#ffd700";
+    createConfetti();
+    haptic("heavy");
+    tg.showAlert("Congratulations! You completed the 24H Hustle Challenge!");
+  } else {
+    modalTitle.textContent = "⏰ Time's Up!";
+    modalText.textContent = `You made ${formatMoney(game.balance)} out of ${formatMoney(GOAL)}. Try again!`;
+    modalTitle.style.color = "#ff6b6b";
+    haptic("heavy");
+  }
+  gameOverModal.classList.add("active");
+}
+
+function resetGame() {
+  game = {
+    balance: 0,
+    income: 0,
+    assets: 0,
+    taps: 0,
+    startTime: Date.now(),
+    completed: false,
+    won: false
+  };
+  gameOverModal.classList.remove("active");
+  debouncedSave();
+  updateUI();
+  haptic("medium");
+}
+
+// UI Updates
+function updateUI() {
+  // Balance
+  balanceEl.textContent = formatMoney(game.balance);
+  ppsEl.textContent = `+${formatMoney(game.income)}/sec`;
+
+  // Role
+  const currentRole = getRole();
+  roleEl.textContent = currentRole;
+
+  // Stats
+  assetCountEl.textContent = game.assets;
+  tapCountEl.textContent = game.taps.toLocaleString();
+  ownedCountEl.textContent = game.assets;
+
+  // Progress Bar
+  const progress = Math.min(100, (game.balance / GOAL) * 100);
+  progressBar.style.width = progress + "%";
+
+  // Timer
+  const timeLeft = getTimeLeft();
+  timerEl.textContent = formatTime(timeLeft);
+  if (timeLeft < 3600000) timerEl.style.color = "#ff4757";
+  else if (timeLeft < 7200000) timerEl.style.color = "#ffa502";
+  else timerEl.style.color = "#2ed573";
+
+  // Asset Button
+  const price = getAssetPrice();
+  assetInfo.textContent = `${formatMoney(price)} → +$${ASSET_INCOME}/sec`;
+
+  if (game.balance >= price) {
+    assetBtn.classList.remove("disabled");
+    assetBtn.classList.add("affordable");
+  } else {
+    assetBtn.classList.add("disabled");
+    assetBtn.classList.remove("affordable");
+  }
+
+  // Status Text
+  if (game.won) {
+    statusEl.textContent = "🏆 Challenge completed! You're a winner!";
+  } else if (game.completed) {
+    statusEl.textContent = "Challenge failed. Tap Play Again to restart.";
+  } else {
+    const percent = Math.floor(progress);
+    const rank = percent > 80 ? "Top 1%" : percent > 50 ? "Top 10%" : percent > 20 ? "Top 25%" : "Keep grinding";
+    statusEl.textContent = `${rank} • ${percent}% to goal`;
+  }
+
+  // Disable interactions if game over
+  if (game.completed) {
+    tapBtn.disabled = true;
+    assetBtn.classList.add("disabled");
+  } else {
+    tapBtn.disabled = false;
+  }
+}
+
+// Event Handlers
+tapBtn.addEventListener("click", (e) => {
+  if (game.completed) return;
+
+  if (!game.startTime) game.startTime = Date.now();
+
+  game.balance += TAP_VALUE;
+  game.taps++;
+
+  // Visual feedback
+  const rect = tapBtn.getBoundingClientRect();
+  const x = rect.left + rect.width / 2 + (Math.random() - 0.5) * 40;
+  const y = rect.top;
+  showFloatingText(x, y, "+$5");
+  animateBalance();
+  haptic("light");
+
+  checkGameEnd();
+  debouncedSave();
+  updateUI();
+});
+
+assetBtn.addEventListener("click", (e) => {
+  if (game.completed) return;
+
+  const price = getAssetPrice();
+  if (game.balance < price) {
+    haptic("rigid");
+    showFloatingText(e.clientX, e.clientY, "Need more cash!", "#ff4757");
+    return;
+  }
+
+  if (!game.startTime) game.startTime = Date.now();
+
+  game.balance -= price;
+  game.assets++;
+  game.income += ASSET_INCOME;
+
+  haptic("medium");
+  showFloatingText(e.clientX, e.clientY, `+${ASSET_INCOME}/sec!`, "#2ed573");
+  animateBalance();
+
+  debouncedSave();
+  updateUI();
+});
+
+restartBtn.addEventListener("click", resetGame);
+
+// Passive Income Loop
+setInterval(() => {
+  if (game.completed || game.income === 0) return;
+
+  game.balance += game.income;
+  checkGameEnd();
+  debouncedSave();
+  updateUI();
+}, 1000);
+
+// Initialize
+function init() {
+  try {
+    const saved = localStorage.getItem(KEY);
+    if (saved) {
+      const loaded = JSON.parse(saved);
+      // Validate data
+      if (loaded && typeof loaded.balance === "number") {
+        game = {...game, ...loaded};
+        // Check if already expired
+        if (getTimeLeft() <= 0 && !game.completed) {
+          game.completed = true;
         }
+      }
+    } else {
+      game.startTime = Date.now();
+    }
+  } catch (e) {
+    console.error("Load failed:", e);
+    game.startTime = Date.now();
+  }
 
-        // --- ПОКУПКА АКТИВОВ ---
-        window.buyAsset = function(index) {
-            let asset = ASSETS[index];
-            // Цена растет с каждой покупкой (коэф 1.2)
-            let price = Math.floor(asset.cost * Math.pow(1.15, game.assets[index]));
+  updateUI();
 
-            if (game.balance >= price) {
-                game.balance -= price;
-                game.assets[index]++;
-                if(navigator.vibrate) navigator.vibrate(20);
-                saveGame();
-                updateUI();
-                renderAssets(); // Перерисовать цены
-            }
-        }
+  // Set theme
+  if (tg.setHeaderColor) tg.setHeaderColor("#0f0f0f");
+  if (tg.setBackgroundColor) tg.setBackgroundColor("#0f0f0f");
+}
 
-        // --- РЕНДЕР UI ---
-        function updateUI() {
-            balEl.innerText = "$" + game.balance.toLocaleString();
+init();
 
-            let curLvl = LEVELS[game.level];
-            let nextLvl = LEVELS[game.level + 1];
+// Visibility API - save when switching tabs
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    debouncedSave();
+  }
+});
+</script>
 
-            iconEl.innerText = curLvl.icon;
-            nameEl.innerText = curLvl.name;
-            powEl.innerText = "Active Income: $" + curLvl.tap + "/click";
-            passEl.innerText = "Passive Income: +$" + calcPassive().toLocaleString() + "/sec";
-
-            // Прогресс бар
-            if (nextLvl) {
-                let percent = (game.balance / nextLvl.cost) * 100;
-                if (percent > 100) percent = 100;
-                progFill.style.width = percent + "%";
-                nextNameEl.innerText = "Next: " + nextLvl.name;
-                nextCostEl.innerText = "Need: $" + nextLvl.cost.toLocaleString();
-            } else {
-                progFill.style.width = "100%";
-                nextNameEl.innerText = "WORLD DOMINATION";
-                nextCostEl.innerText = "";
-            }
-
-            // Обновление доступности кнопок активов
-            updateAssetsState();
-        }
-
-        function renderAssets() {
-            assetsCont.innerHTML = "";
-            ASSETS.forEach((asset, index) => {
-                let count = game.assets[index];
-                let price = Math.floor(asset.cost * Math.pow(1.15, count));
-
-                let el = document.createElement('div');
-                el.className = "asset-card locked";
-                el.id = "asset-" + index;
-                el.onclick = () => buyAsset(index);
-
-                el.innerHTML = `
-                    <div class="asset-count">${count}</div>
-                    <div class="asset-icon">${asset.icon}</div>
-                    <div>
-                        <div class="asset-name">${asset.name}</div>
-                        <div class="asset-profit">+$${asset.earn}/s</div>
-                    </div>
-                    <div class="asset-cost">$${price.toLocaleString()}</div>
-                `;
-                assetsCont.appendChild(el);
-            });
-            updateAssetsState();
-        }
-
-        function updateAssetsState() {
-            ASSETS.forEach((asset, index) => {
-                let count = game.assets[index];
-                let price = Math.floor(asset.cost * Math.pow(1.15, count));
-                let el = document.getElementById("asset-" + index);
-
-                if (game.balance >= price) {
-                    el.className = "asset-card can-buy";
-                } else {
-                    el.className = "asset-card locked";
-                }
-            });
-        }
-
-        function calcPassive() {
-            let total = 0;
-            ASSETS.forEach((a, i) => {
-                total += a.earn * game.assets[i];
-            });
-            return total;
-        }
-
-        function spawnFloat(x, y, val) {
-            const el = document.createElement('div');
-            el.className = 'float-text';
-            el.innerText = "+$" + val;
-            el.style.left = (x - 20) + 'px';
-            el.style.top = (y - 80) + 'px'; // Чуть выше клика
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 800);
-        }
-
-        // --- СОХРАНЕНИЕ ---
-        function saveGame() {
-            localStorage.setItem('empire_save', JSON.stringify(game));
-        }
-
-        function loadGame() {
-            let saved = localStorage.getItem('empire_save');
-            if (saved) {
-                game = JSON.parse(saved);
-                // Проверка на целостность массива ассетов
-                if(!game.assets) game.assets = [0,0,0,0,0];
-            }
-        }
-    </script>
 </body>
 </html>
