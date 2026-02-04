@@ -1,397 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GHOST PROTOCOL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* --- CORE STYLES --- */
-        :root {
-            --neon-red: #ff3333;
-            --neon-green: #00ff41;
-            --bg-color: #050505;
-            --glass: rgba(20, 20, 20, 0.9);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>STATE WARS — TELEGRAM ONLY</title>
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--neon-green);
-            font-family: 'Courier Prime', monospace;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
+<style>
+body {
+  margin:0;
+  background:#050505;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,Arial;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  text-align:center;
+}
+.screen { display:none; max-width:420px; padding:24px; }
+.screen.active { display:block; }
 
-        /* Эффект старого ЭЛТ монитора (полоски) */
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            z-index: 99999;
-            opacity: 0.6;
-        }
+h1 { font-size:26px; margin-bottom:10px; }
+h2 { font-size:20px; margin-bottom:14px; }
 
-        /* --- HEADER --- */
-        .top-bar {
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-            background: #000;
-        }
+button {
+  width:100%;
+  padding:16px;
+  font-size:16px;
+  font-weight:bold;
+  border:none;
+  border-radius:10px;
+  margin-top:12px;
+  cursor:pointer;
+}
 
-        .secure-badge {
-            font-size: 10px;
-            color: #888;
-            border: 1px solid #333;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .dot { width: 6px; height: 6px; background: var(--neon-green); border-radius: 50%; animation: blink 2s infinite; }
+.primary { background:#ff3b3b; color:#000; }
+.secondary { background:#222; color:#fff; border:1px solid #444; }
 
-        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.3;} 100% {opacity: 1;} }
+.warning { color:#ff3b3b; font-weight:bold; }
+.small { font-size:13px; opacity:.7; margin-top:10px; }
 
-        #balance {
-            font-size: 32px;
-            font-weight: bold;
-            text-shadow: 0 0 10px var(--neon-green);
-        }
+.bar {
+  width:100%;
+  height:14px;
+  background:#222;
+  border-radius:7px;
+  overflow:hidden;
+  margin:14px 0;
+}
+.fill {
+  height:100%;
+  background:#ff3b3b;
+  width:0%;
+  transition:width .3s;
+}
 
-        /* --- MAIN SCREEN --- */
-        .screen {
-            flex-grow: 1;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding-bottom: 70px; /* Space for nav */
-            width: 100%;
-        }
-        .screen.active { display: flex; }
-
-        /* --- HACK BUTTON (REDESIGNED) --- */
-        .hack-btn-container {
-            position: relative;
-            width: 260px; height: 260px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .hack-btn {
-            width: 220px; height: 220px;
-            border-radius: 50%;
-            background: #000;
-            border: 2px solid var(--neon-green);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: transform 0.1s;
-        }
-
-        .hack-btn:active { transform: scale(0.95); background: #0a1f0a; }
-
-        .btn-text {
-            font-size: 20px;
-            letter-spacing: 2px;
-            font-weight: bold;
-        }
-        .btn-sub { font-size: 10px; opacity: 0.7; margin-top: 5px; }
-
-        /* Крутящееся кольцо вокруг кнопки */
-        .spinner {
-            position: absolute; width: 100%; height: 100%;
-            border: 2px dashed #333; border-radius: 50%;
-            animation: spin 10s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* --- ATTACK MODE (PVP) --- */
-        .attack-log {
-            width: 90%;
-            height: 50vh;
-            background: #000;
-            border: 1px solid var(--neon-red);
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(255, 51, 51, 0.2);
-        }
-        .log-entry { margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; }
-        .log-red { color: var(--neon-red); }
-        .log-green { color: var(--neon-green); }
-
-        .attack-btn {
-            background: var(--neon-red);
-            color: #000;
-            font-weight: bold;
-            font-family: 'Courier Prime', monospace;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            cursor: pointer;
-            clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
-        }
-        .attack-btn:active { transform: scale(0.95); }
-
-        /* --- ENERGY --- */
-        .energy-container {
-            width: 80%;
-            position: absolute; bottom: 90px;
-        }
-        .energy-bar { height: 4px; background: #222; width: 100%; }
-        .energy-fill { height: 100%; background: var(--neon-green); width: 100%; transition: width 0.2s; }
-        .energy-text { font-size: 10px; margin-top: 5px; text-align: right; opacity: 0.6; }
-
-        /* --- BOTTOM NAV --- */
-        .nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
-            background: #000; border-top: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 100;
-        }
-        .nav-item {
-            text-align: center; font-size: 10px; opacity: 0.5; cursor: pointer;
-            width: 33%; padding: 10px 0;
-        }
-        .nav-item.active { opacity: 1; color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
-        .icon { font-size: 20px; display: block; margin-bottom: 4px; }
-
-        /* --- EFFECTS --- */
-        .float-money {
-            position: absolute;
-            color: #fff; font-weight: bold; font-size: 24px;
-            pointer-events: none;
-            animation: floatUp 0.8s forwards;
-            z-index: 100;
-        }
-        @keyframes floatUp { to { transform: translateY(-80px); opacity: 0; } }
-
-        /* Glitch effect for Jackpot */
-        .glitch-text { animation: glitch 0.2s infinite; color: var(--neon-red) !important; font-size: 30px !important; }
-        @keyframes glitch { 0% {transform: translate(0);} 20% {transform: translate(-2px, 2px);} 40% {transform: translate(-2px, -2px);} 60% {transform: translate(2px, 2px);} 80% {transform: translate(2px, -2px);} 100% {transform: translate(0);} }
-
-    </style>
+.timer {
+  margin-top:10px;
+  font-size:14px;
+  letter-spacing:1px;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="scanlines"></div>
+<div id="select" class="screen active">
+  <h1>STATE WARS</h1>
+  <p class="small">Americans are choosing sides right now.</p>
 
-    <div class="top-bar">
-        <div class="secure-badge">
-            <div class="dot"></div> TG_ENCRYPTED
-        </div>
-        <div id="balance">$0</div>
-    </div>
+  <button class="secondary" onclick="chooseState('TEXAS')">🤠 TEXAS</button>
+  <button class="secondary" onclick="chooseState('CALIFORNIA')">🌴 CALIFORNIA</button>
+  <button class="secondary" onclick="chooseState('NEW YORK')">🗽 NEW YORK</button>
+  <button class="secondary" onclick="chooseState('FLORIDA')">🐊 FLORIDA</button>
+  <button class="secondary" onclick="chooseState('OHIO')">💀 OHIO</button>
+</div>
 
-    <div id="screen-mine" class="screen active">
-        <div style="margin-bottom: 20px; text-align: center;">
-            <div style="font-size: 12px; opacity: 0.7;">CURRENT TARGET</div>
-            <div style="font-size: 18px; font-weight: bold;">CENTRAL BANK</div>
-        </div>
+<div id="main" class="screen">
+  <h2 id="stateTitle"></h2>
 
-        <div class="hack-btn-container">
-            <div class="spinner"></div>
-            <div class="hack-btn" id="mainBtn" onclick="tap(event)">
-                <div class="btn-text">EXTRACT</div>
-                <div class="btn-sub">DATA</div>
-            </div>
-        </div>
+  <p class="warning">YOUR STATE IS LOSING</p>
+  <p class="small">You are responsible for what happens next.</p>
 
-        <div class="energy-container">
-            <div class="energy-bar"><div class="energy-fill" id="energy"></div></div>
-            <div class="energy-text" id="energyText">1000/1000</div>
-        </div>
-    </div>
+  <div class="bar">
+    <div id="progress" class="fill"></div>
+  </div>
 
-    <div id="screen-attack" class="screen">
-        <div style="font-size: 14px; margin-bottom: 10px; color: var(--neon-red);">LIVE NETWORK LOG</div>
+  <p id="statusText" class="small"></p>
 
-        <div class="attack-log" id="logBox">
-            <div class="log-entry log-green">> Connected to node US_East...</div>
-            <div class="log-entry">> Scanning for vulnerable wallets...</div>
-        </div>
+  <button class="primary" onclick="invite()">DEFEND YOUR STATE</button>
 
-        <button class="attack-btn" onclick="attack()">INITIATE HACK</button>
-        <div style="font-size: 10px; margin-top: 10px; opacity: 0.5;">COST: 100 ENERGY</div>
-    </div>
+  <div class="timer" id="timer"></div>
+</div>
 
-    <div id="screen-network" class="screen">
-        <h2 style="letter-spacing: 3px;">SYNDICATE</h2>
-        <div style="text-align: center; width: 80%;">
-            <p style="font-size: 12px; opacity: 0.8;">
-                Build your crew. Dominance requires numbers.
-                <br><br>
-                <span style="color: var(--neon-green)">REWARD: 10% OF THEIR THEFT</span>
-            </p>
+<script>
+/* ================================
+   TELEGRAM CONTEXT
+================================ */
+let tgUserId = "anon";
+try {
+  if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe?.user?.id) {
+    tgUserId = Telegram.WebApp.initDataUnsafe.user.id;
+  }
+} catch(e){}
 
-            <div style="border: 1px solid #333; padding: 20px; margin: 20px 0; background: #000;">
-                <div style="font-size: 40px;">☠️</div>
-                <div style="margin-top: 10px;">0 MEMBERS</div>
-            </div>
+/* ================================
+   CONFIG
+================================ */
+const WAR_DURATION = 24 * 60 * 60 * 1000; // 24h
+const WAR_START = Number(localStorage.getItem("war_start")) || Date.now();
+localStorage.setItem("war_start", WAR_START);
 
-            <button class="attack-btn" style="background: var(--neon-green); width: 100%;" onclick="copyLink()">RECRUIT AGENTS</button>
-            <div id="copyMsg" style="opacity: 0; font-size: 10px; margin-top: 5px;">ENCRYPTED LINK COPIED</div>
-        </div>
-    </div>
+/* ================================
+   STATE
+================================ */
+let myState = localStorage.getItem("my_state");
+let invites = Number(localStorage.getItem("invites") || 0);
 
-    <div class="nav">
-        <div class="nav-item active" onclick="setTab('mine', this)">
-            <span class="icon">💻</span>
-            TERMINAL
-        </div>
-        <div class="nav-item" onclick="setTab('attack', this)">
-            <span class="icon">⚔️</span>
-            ATTACK
-        </div>
-        <div class="nav-item" onclick="setTab('network', this)">
-            <span class="icon">👥</span>
-            CREW
-        </div>
-    </div>
+/* ================================
+   UI
+================================ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-    <script>
-        // STATE
-        let balance = 0;
-        let energy = 1000;
-        const maxEnergy = 1000;
+/* ================================
+   START
+================================ */
+if(myState) startGame();
 
-        // PERSISTENCE (Сохранение)
-        const savedBal = localStorage.getItem('ghost_bal');
-        const savedEng = localStorage.getItem('ghost_eng');
-        const savedTime = localStorage.getItem('ghost_time');
+function chooseState(s){
+  myState = s;
+  localStorage.setItem("my_state", s);
+  startGame();
+}
 
-        if (savedBal) balance = parseInt(savedBal);
-        if (savedEng && savedTime) {
-            energy = parseInt(savedEng);
-            let diff = (Date.now() - parseInt(savedTime)) / 1000;
-            energy = Math.min(maxEnergy, energy + Math.floor(diff * 5)); // 5 energy per sec
-        }
+function startGame(){
+  show("main");
+  document.getElementById("stateTitle").innerText = myState;
+  update();
+}
 
-        updateUI();
+/* ================================
+   LOGIC
+================================ */
+function update() {
+  const now = Date.now();
+  const passed = now - WAR_START;
+  const timeLeft = Math.max(0, WAR_DURATION - passed);
 
-        // --- MECHANICS ---
+  let baseProgress = Math.min(95, Math.floor(passed / WAR_DURATION * 100));
+  let userImpact = Math.min(40, invites * 5);
+  let total = Math.min(100, baseProgress + userImpact);
 
-        function tap(e) {
-            if (energy < 10) return;
+  document.getElementById("progress").style.width = total + "%";
 
-            if (navigator.vibrate) navigator.vibrate(10);
+  const status = document.getElementById("statusText");
+  if (invites === 0) {
+    status.innerText = "No one joined because of you.";
+  } else {
+    status.innerText = "People recruited by you: " + invites;
+  }
 
-            // Logic
-            let gain = Math.floor(Math.random() * 5) + 2;
-            let isCrit = Math.random() > 0.98; // 2% chance
+  const h = Math.floor(timeLeft / 3600000);
+  const m = Math.floor(timeLeft / 60000) % 60;
+  document.getElementById("timer").innerText =
+    "WAR ENDS IN " + h + "h " + m + "m";
+}
 
-            if (isCrit) gain = 500; // JACKPOT
+  const h = Math.floor(timeLeft / 3600000);
+  const m = Math.floor(timeLeft / 60000) % 60;
+  document.getElementById("timer").innerText =
+    "WAR ENDS IN " + h + "h " + m + "m";
+}
 
-            balance += gain;
-            energy -= 10;
-            updateUI();
-            save();
+/* ================================
+   INVITE
+================================ */
+function invite(){
+  invites++;
+  localStorage.setItem("invites", invites);
 
-            // Visuals
-            let x = e.clientX || (e.touches ? e.touches[0].clientX : window.innerWidth/2);
-            let y = e.clientY || (e.touches ? e.touches[0].clientY : window.innerHeight/2);
+  // Telegram deep-link (работает реально)
+  const link =
+    "https://t.me/YOUR_BOT_USERNAME?start=state_" +
+    myState +
+    "from" +
+    tgUserId;
 
-            showFloat(x, y, gain, isCrit);
-        }
+  if(navigator.vibrate) navigator.vibrate([30,30]);
 
-        function attack() {
-            if (energy < 100) {
-                alert("INSUFFICIENT POWER. NEED 100.");
-                return;
-            }
+  navigator.clipboard?.writeText(link);
+  alert("Invite link copied.\nYour state depends on you.");
 
-            energy -= 100;
-            updateUI();
-            if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+  update();
+}
 
-            const logBox = document.getElementById('logBox');
-            const targets = ["User_992", "Anon_X", "CryptoWhale", "Fed_Reserve_Node", "ElonMusk_Bot"];
-            const target = targets[Math.floor(Math.random() * targets.length)];
-            const stolen = Math.floor(Math.random() * 200) + 50;
+setInterval(update, 30000);
+</script>
 
-            // Fake processing delay
-            const p1 = document.createElement('div');
-            p1.className = 'log-entry';
-            p1.innerText = > Breaching firewall of ${target}...;
-            logBox.prepend(p1);
-
-            setTimeout(() => {
-                const p2 = document.createElement('div');
-                p2.className = 'log-entry log-green';
-                p2.innerText = > SUCCESS! Drained $${stolen}.;
-                logBox.prepend(p2);
-                balance += stolen;
-                updateUI();
-                save();
-            }, 800);
-        }
-
-        function showFloat(x, y, amount, isCrit) {
-            const el = document.createElement('div');
-            el.className = 'float-money';
-            el.innerText = "+$" + amount;
-            if (isCrit) {
-                el.innerText = "CRITICAL +$" + amount;
-                el.classList.add('glitch-text');
-            }
-            el.style.left = (x - 20) + "px";
-            el.style.top = (y - 50) + "px";
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
-        }
-
-        function updateUI() {
-            document.getElementById('balance').innerText = "$" + balance.toLocaleString();
-            document.getElementById('energy').style.width = (energy / maxEnergy * 100) + "%";
-            document.getElementById('energyText').innerText = ${Math.floor(energy)}/${maxEnergy};
-        }
-
-        function save() {
-            localStorage.setItem('ghost_bal', balance);
-            localStorage.setItem('ghost_eng', energy);
-            localStorage.setItem('ghost_time', Date.now());
-        }
-
-        // Regen Loop
-        setInterval(() => {
-            if (energy < maxEnergy) {
-                energy += 5;
-                if (energy > maxEnergy) energy = maxEnergy;
-                updateUI();
-                save();
-            }
-        }, 1000);
-
-        // Nav
-        window.setTab = function(id, el) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('screen-' + id).classList.add('active');
-            el.classList.add('active');
-        }
-
-        window.copyLink = function() {
-            // Here you will put your BOT link
-            const msg = document.getElementById('copyMsg');
-            msg.style.opacity = 1;
-            setTimeout(() => msg.style.opacity = 0, 2000);
-        }
-
-    </script>
 </body>
 </html>
