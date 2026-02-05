@@ -3,23 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="24 Hour Hustle Challenge - How fast can you make $10,000?">
-<title>24H Hustle Challenge</title>
-
+<meta name="theme-color" content="#000000">
+<title>24H GRIND</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
+:root {
+  --gold: #ffd700;
+  --red: #ff3b30;
+  --green: #30d158;
+  --orange: #ff9500;
+  --bg: #000000;
+  --card: #0a0a0a;
+  --border: #1a1a1a;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  touch-action: manipulation;
 }
 
 body {
-  background: radial-gradient(ellipse at top, #2d2d2d 0%, #0f0f0f 100%);
+  background: var(--bg);
   color: #fff;
   height: 100vh;
   display: flex;
@@ -27,417 +36,823 @@ body {
   overflow: hidden;
   position: fixed;
   width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
 }
 
-/* Header Section */
+/* Particles */
+.particle {
+  position: absolute;
+  pointer-events: none;
+  animation: particle 0.8s ease-out forwards;
+  font-weight: 900;
+  font-size: 20px;
+  z-index: 1000;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+@keyframes particle {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* Screen shake on critical */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.shake { animation: shake 0.3s ease-in-out; }
+
+/* Pulse for critical hit */
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+  50% { box-shadow: 0 0 20px 10px rgba(255, 215, 0, 0); }
+}
+
+/* Header - Compact for retention */
 .header {
-  padding: 20px 16px;
-  text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  background: rgba(0,0,0,0.2);
-  backdrop-filter: blur(10px);
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #111 0%, #000 100%);
+  border-bottom: 1px solid var(--border);
+  position: relative;
 }
 
-.header h1 {
-  font-size: 12px;
-  letter-spacing: 3px;
-  color: #888;
+.live-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #555;
+  margin-bottom: 4px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--red);
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  background: var(--red);
+  border-radius: 50%;
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.balance-container {
+  text-align: center;
+  position: relative;
+}
+
+.balance-label {
+  font-size: 10px;
+  color: #555;
   text-transform: uppercase;
-  font-weight: 600;
+  letter-spacing: 2px;
+  font-weight: 800;
 }
 
 .balance {
   font-size: 48px;
-  font-weight: 800;
-  color: #ffd700;
-  margin-top: 8px;
-  text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  line-height: 1;
+  margin: 4px 0;
+  font-variant-numeric: tabular-nums;
   transition: transform 0.1s;
 }
 
-.balance.pop {
-  transform: scale(1.1);
+.balance.pop { transform: scale(1.15); }
+
+.combo-text {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--orange);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.sub {
+.combo-text.show { opacity: 1; }
+
+.income-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
-  color: #666;
-  margin-top: 4px;
-  font-weight: 500;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.multiplier-badge {
+  background: var(--orange);
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+/* Timer - Critical urgency */
+.timer-container {
+  margin-top: 6px;
+  text-align: center;
 }
 
 .timer {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #ff4757;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+
+.timer.danger {
+  color: var(--red);
+  animation: blink 1s infinite;
+}
+
+.timer.critical {
+  color: var(--red);
+  animation: blink 0.5s infinite;
+  font-size: 22px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.progress-container {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .progress-bar {
-  width: 80%;
+  flex: 1;
   height: 4px;
-  background: rgba(255,255,255,0.1);
+  background: #222;
   border-radius: 2px;
-  margin: 12px auto 0;
   overflow: hidden;
+  position: relative;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ffd700, #ffed4e);
-  transition: width 0.3s ease;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  background: linear-gradient(90deg, var(--red) 0%, var(--gold) 50%, var(--green) 100%);
+  width: 0%;
+  transition: width 0.3s ease-out;
+  box-shadow: 0 0 10px currentColor;
 }
 
-/* Main Content */
+.progress-text {
+  font-size: 10px;
+  color: #666;
+  font-weight: 700;
+  min-width: 35px;
+  text-align: right;
+}
+
+/* Main Game Area */
 .main {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.card {
-  width: 100%;
-  max-width: 360px;
-  padding: 28px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(40,40,40,0.8) 0%, rgba(20,20,20,0.9) 100%);
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
-}
-
-.role {
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.goal {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 20px;
-  font-weight: 500;
-}
-
-/* Tap Button */
-.tap-btn {
-  width: 100%;
-  height: 72px;
-  border-radius: 18px;
-  border: none;
-  background: linear-gradient(135deg, #ffd700 0%, #ffb800 100%);
-  font-size: 18px;
-  font-weight: 800;
-  color: #000;
-  cursor: pointer;
-  box-shadow: 0 6px 0 #cc8a00, 0 10px 20px rgba(0,0,0,0.3);
-  transition: all 0.1s;
-  position: relative;
-  overflow: hidden;
-}
-
-.tap-btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 2px 0 #cc8a00, 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.tap-btn::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  transition: left 0.5s;
-}
-
-.tap-btn:active::after {
-  left: 100%;
-}
-
-.tap-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Floating Text Animation */
-.float-text {
-  position: absolute;
-  color: #ffd700;
-  font-weight: 800;
-  font-size: 20px;
-  pointer-events: none;
-  animation: floatUp 1s ease-out forwards;
-  z-index: 1000;
-}
-
-@keyframes floatUp {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
-}
-
-/* Asset Section */
-.asset-section {
-  margin-top: 20px;
-  display: flex;
   flex-direction: column;
+  padding: 12px;
+  overflow-y: auto;
   gap: 12px;
 }
 
-.asset {
-  padding: 16px;
+/* Rank Card */
+.rank-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+  border: 1px solid var(--border);
   border-radius: 16px;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
-  cursor: pointer;
-  transition: all 0.2s;
+  padding: 12px;
+  text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-.asset:not(.disabled):hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,215,0,0.3);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-.asset.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  filter: grayscale(0.8);
-}
-
-.asset.affordable {
-  border-color: rgba(255,215,0,0.5);
-  box-shadow: 0 0 15px rgba(255,215,0,0.1);
-}
-
-.asset-title {
-  font-weight: 700;
-  font-size: 15px;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.asset-sub {
-  font-size: 12px;
-  color: #888;
-  font-weight: 500;
-}
-
-.asset-count {
+.rank-card::before {
+  content: '';
   position: absolute;
-  top: 8px;
-  right: 12px;
-  background: rgba(255,215,0,0.2);
-  color: #ffd700;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* Status Footer */
-.footer {
-  padding: 16px;
-  text-align: center;
-  font-size: 12px;
-  color: #666;
-  background: rgba(0,0,0,0.2);
-  border-top: 1px solid rgba(255,255,255,0.05);
-  font-weight: 500;
-}
-
-/* Modals */
-.modal {
-  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.9);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 20px;
-  backdrop-filter: blur(10px);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
 }
 
-.modal.active {
-  display: flex;
+.rank-emoji {
+  font-size: 28px;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
-.modal-content {
-  background: linear-gradient(180deg, #1f1f1f, #151515);
-  padding: 32px;
-  border-radius: 24px;
-  border: 1px solid rgba(255,215,0,0.2);
-  text-align: center;
-  max-width: 320px;
-  width: 100%;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+.rank-title {
+  font-size: 20px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff 0%, #888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
 }
 
-.modal-title {
-  font-size: 24px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: #ffd700;
-}
-
-.modal-text {
-  color: #aaa;
-  margin-bottom: 24px;
-  line-height: 1.5;
-  font-size: 14px;
-}
-
-.modal-btn {
-  background: linear-gradient(135deg, #ffd700, #ffb800);
-  border: none;
-  padding: 16px 32px;
-  border-radius: 12px;
-  font-weight: 800;
-  color: #000;
-  cursor: pointer;
-  font-size: 16px;
-  width: 100%;
-  box-shadow: 0 4px 0 #cc8a00;
-  transition: transform 0.1s;
-}
-
-.modal-btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 #cc8a00;
-}
-
-/* Confetti */
-.confetti {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  position: absolute;
-  animation: confetti-fall 3s ease-out forwards;
-  z-index: 3000;
-}
-
-@keyframes confetti-fall {
-  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+.rank-sub {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+  font-weight: 600;
 }
 
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 16px 0;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
 }
 
 .stat-box {
-  background: rgba(0,0,0,0.3);
-  padding: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.05);
+  padding: 10px;
+  text-align: center;
+  position: relative;
 }
 
 .stat-label {
-  font-size: 11px;
-  color: #666;
+  font-size: 9px;
+  color: #555;
   text-transform: uppercase;
   letter-spacing: 1px;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
 .stat-value {
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-change {
+  font-size: 9px;
+  color: var(--green);
   font-weight: 700;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+/* Tap Button - The Money Maker */
+.tap-container {
+  position: relative;
+  margin: 8px 0;
+}
+
+.tap-btn {
+  width: 100%;
+  height: 80px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--gold) 0%, #ffaa00 100%);
+  color: #000;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #cc8800,
+    0 10px 30px rgba(255, 215, 0, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: all 0.05s;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tap-btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #cc8800,
+    0 5px 15px rgba(255, 215, 0, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.tap-btn.critical {
+  animation: pulse-gold 0.5s;
+  background: linear-gradient(180deg, #fff 0%, var(--gold) 100%);
+}
+
+.tap-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+  transform: rotate(45deg) translateX(-100%);
+  transition: transform 0.3s;
+}
+
+.tap-btn:active::after {
+  transform: rotate(45deg) translateX(100%);
+}
+
+.critical-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+}
+
+.critical-text.show {
+  animation: critical-pop 0.8s forwards;
+}
+
+@keyframes critical-pop {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  80% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -80%) scale(1); opacity: 0; }
+}
+
+/* Leaderboard Teaser */
+.leaderboard-teaser {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.leader-text {
+  color: #888;
+  font-weight: 600;
+}
+
+.leader-name {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.leader-score {
+  color: #fff;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.passed-you {
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 800;
+  animation: slide-in 0.3s;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(-10px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Asset Button */
+.asset-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.asset-btn:hover:not(.disabled) {
+  border-color: #444;
+  background: #111;
+  transform: translateY(-2px);
+}
+
+.asset-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+.asset-btn.affordable {
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+  animation: affordable-pulse 2s infinite;
+}
+
+@keyframes affordable-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); }
+}
+
+.asset-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #222 0%, #111 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  border: 1px solid #333;
+}
+
+.asset-info {
+  flex: 1;
+}
+
+.asset-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.asset-sub {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.asset-count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,215,0,0.15);
+  color: var(--gold);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.asset-price {
+  text-align: right;
+}
+
+.price-value {
+  font-size: 16px;
+  font-weight: 900;
   color: #fff;
 }
 
-/* Responsive */
-@media (max-height: 700px) {
-  .card { padding: 20px; }
-  .balance { font-size: 36px; }
-  .tap-btn { height: 60px; }
+.price-label {
+  font-size: 10px;
+  color: #555;
+  font-weight: 700;
+  text-transform: uppercase;
 }
+
+/* Action Buttons */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.action-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: #444;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.05) 100%);
+  border-color: rgba(255,215,0,0.3);
+}
+
+.action-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.action-text {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-sub {
+  font-size: 9px;
+  color: #666;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  backdrop-filter: blur(20px);
+}
+
+.modal.active { display: flex; }
+
+.modal-content {
+  background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+  border: 1px solid #333;
+  border-radius: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--gold), var(--green));
+}
+
+.modal-emoji {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.modal-text {
+  color: #888;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-btn {
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(180deg, var(--gold) 0%, #ffaa00 100%);
+  color: #000;
+  box-shadow: 0 4px 0 #cc8800;
+}
+
+.modal-btn.secondary {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid #333;
+}
+
+.modal-btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* Streak/Warning Banner */
+.banner {
+  background: linear-gradient(90deg, rgba(255,59,48,0.2) 0%, rgba(255,59,48,0.1) 100%);
+  border: 1px solid rgba(255,59,48,0.3);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+  text-align: center;
+  margin-bottom: 8px;
+  display: none;
+}
+
+.banner.show { display: block; animation: slideDown 0.3s; }
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 3000;
+  animation: confetti-fall 2s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* Critical hit flash */
+.flash {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,215,0,0.2);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 500;
+  transition: opacity 0.1s;
+}
+
+.flash.show { opacity: 1; }
 </style>
 </head>
-
 <body>
 
+<div class="flash" id="flash"></div>
+
 <div class="header">
-  <h1>24H Hustle Challenge</h1>
-  <div class="balance" id="balance">$0</div>
-  <div class="sub" id="pps">+$0 / sec</div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+  <div class="live-bar">
+    <div class="live-indicator">
+      <span class="dot"></span>
+      <span id="liveCount">1,247 ACTIVE</span>
+    </div>
+    <div style="color: #333;">|</div>
+    <div style="color: #666;">YOUR ID: <span id="userId">---</span></div>
   </div>
-  <div class="timer" id="timer">24h 0m remaining</div>
+
+  <div class="balance-container">
+    <div class="balance-label">NET WORTH</div>
+    <div class="balance" id="balance">$0</div>
+    <div class="combo-text" id="comboText">COMBO x5!</div>
+  </div>
+
+  <div class="income-bar">
+    <span>+$<span id="income">0</span>/sec</span>
+    <span id="multiplierBadge" class="multiplier-badge" style="display: none;">+20%</span>
+  </div>
+
+  <div class="timer-container">
+    <div class="timer" id="timer">24:00:00</div>
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+      <div class="progress-text" id="progressText">0%</div>
+    </div>
+  </div>
 </div>
 
 <div class="main">
-  <div class="card" id="gameCard">
-    <div class="role" id="role">Nobody</div>
-    <div class="goal">Goal: $10,000 in 24 hours</div>
+  <div class="banner" id="warningBanner">
+    ⚠️ 94% QUIT HERE. DON'T BE SOFT.
+  </div>
 
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-label">Assets</div>
-        <div class="stat-value" id="assetCount">0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Taps</div>
-        <div class="stat-value" id="tapCount">0</div>
-      </div>
+  <div class="rank-card">
+    <div class="rank-emoji" id="rankEmoji">💀</div>
+    <div class="rank-title" id="rankTitle">BROKE</div>
+    <div class="rank-sub">Mission: $10K in 24h • <span style="color: var(--red)">Most Fail</span></div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-label">Assets</div>
+      <div class="stat-value" id="assets">0</div>
+      <div class="stat-change" id="assetChange" style="display: none;">+$2</div>
     </div>
+    <div class="stat-box">
+      <div class="stat-label">Taps</div>
+      <div class="stat-value" id="taps">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Best</div>
+      <div class="stat-value" id="bestScore">$0</div>
+    </div>
+  </div>
 
-    <button class="tap-btn" id="tapBtn">EARN $5</button>
+  <div class="leaderboard-teaser" id="leaderTeaser" style="display: none;">
+    <div>
+      <span class="leader-text">🔥 </span>
+      <span class="leader-name" id="leaderName">Mike_T</span>
+      <span class="leader-text"> just hit </span>
+      <span class="leader-score" id="leaderScore">$5,240</span>
+    </div>
+    <div class="passed-you" id="passedYou" style="display: none;">PASSED YOU!</div>
+  </div>
 
-    <div class="asset-section">
-      <div class="asset" id="assetBtn">
-        <div class="asset-count" id="ownedCount">0</div>
-        <div class="asset-title">💼 Side Hustle</div>
-        <div class="asset-sub" id="assetInfo">$200 → +$2/sec</div>
-      </div>
+  <div class="tap-container">
+    <div class="critical-text" id="criticalText">CRITICAL! 💥</div>
+    <button class="tap-btn" id="tapBtn">GRIND +$5</button>
+  </div>
+
+  <div class="asset-btn disabled" id="assetBtn">
+    <div class="asset-icon">💼</div>
+    <div class="asset-info">
+      <div class="asset-title">Passive Income <span style="font-size: 11px; color: var(--gold); font-weight: 800;">HOT</span></div>
+      <div class="asset-sub">Generates money while you sleep</div>
+    </div>
+    <div class="asset-price">
+      <div class="price-value" id="assetPrice">$200</div>
+      <div class="price-label">+$2/sec</div>
+    </div>
+    <div class="asset-count" id="ownedCount" style="display: none;">0</div>
+  </div>
+
+  <div class="action-grid">
+    <div class="action-btn primary" id="inviteBtn">
+      <div class="action-icon">📤</div>
+      <div class="action-text">Flex on Friends</div>
+      <div class="action-sub">+20% Speed Bonus</div>
+    </div>
+    <div class="action-btn" id="continueBtn" style="display: none;">
+      <div class="action-icon">🎬</div>
+      <div class="action-text">Watch Ad</div>
+      <div class="action-sub">Continue Run</div>
     </div>
   </div>
 </div>
-
-<div class="footer" id="status">Start hustling!</div>
 
 <!-- Game Over Modal -->
 <div class="modal" id="gameOverModal">
   <div class="modal-content">
-    <div class="modal-title" id="modalTitle">Challenge Complete!</div>
-    <div class="modal-text" id="modalText">You made $10,000!</div>
-    <button class="modal-btn" id="restartBtn">Play Again</button>
+    <div class="modal-emoji" id="modalEmoji">⏰</div>
+    <div class="modal-title" id="modalTitle">TIME'S UP!</div>
+    <div class="modal-text" id="modalText">You made $0.<br>94% of players quit here.</div>
+    <div class="modal-buttons">
+      <button class="modal-btn primary" id="restartBtn">GRIND AGAIN</button>
+      <button class="modal-btn secondary" id="shareBtn">FLEX ON FRIENDS</button>
+    </div>
   </div>
 </div>
 
@@ -445,24 +860,25 @@ body {
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
+tg.setHeaderColor('#000000');
 
 // Game Constants
 const GOAL = 10000;
-const DURATION = 24 * 60 * 60 * 1000; // 24 hours
-const TAP_VALUE = 5;
-const BASE_ASSET_PRICE = 200;
-const ASSET_INCOME = 2;
-const PRICE_MULTIPLIER = 1.4;
+const DURATION = 24 * 60 * 60 * 1000;
+const BASE_PRICE = 200;
+const PRICE_MULT = 1.5;
+const INCOME_PER_ASSET = 2;
+const CRITICAL_CHANCE = 0.05; // 5% chance
+const CRITICAL_MULT = 5;
 
-// User ID
-let userId = "guest";
-if (tg.initDataUnsafe?.user?.id) {
-  userId = tg.initDataUnsafe.user.id;
-} else if (tg.initDataUnsafe?.user?.username) {
-  userId = tg.initDataUnsafe.user.username;
-}
+// Get user data
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get('user') || Math.random().toString(36).substr(2, 9);
+const hasRef = urlParams.has('ref');
 
-const KEY = "hustle_v2_" + userId;
+// Fake names for social proof
+const fakeNames = ['Jake_T', 'Mike_NYC', 'Sarah_Hustle', 'Crypto_King', 'Sigma_Grind', 'Alpha_Wolf', 'Hustle_247'];
+let currentFakeIndex = 0;
 
 // Game State
 let game = {
@@ -470,322 +886,378 @@ let game = {
   income: 0,
   assets: 0,
   taps: 0,
-  startTime: null,
-  completed: false,
-  won: false
+  startTime: Date.now(),
+  combo: 0,
+  lastTap: 0,
+  bestScore: 0,
+  prestigeLevel: 0,
+  multiplier: hasRef ? 1.2 : 1.0
 };
 
-// DOM Elements
-const balanceEl = document.getElementById("balance");
-const ppsEl = document.getElementById("pps");
-const roleEl = document.getElementById("role");
-const timerEl = document.getElementById("timer");
-const assetInfo = document.getElementById("assetInfo");
-const assetBtn = document.getElementById("assetBtn");
-const statusEl = document.getElementById("status");
-const progressBar = document.getElementById("progressBar");
-const assetCountEl = document.getElementById("assetCount");
-const tapCountEl = document.getElementById("tapCount");
-const ownedCountEl = document.getElementById("ownedCount");
-const tapBtn = document.getElementById("tapBtn");
-const gameOverModal = document.getElementById("gameOverModal");
-const modalTitle = document.getElementById("modalTitle");
-const modalText = document.getElementById("modalText");
-const restartBtn = document.getElementById("restartBtn");
-
-// Save Debounce
-let saveTimeout;
-function debouncedSave() {
-  clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(game));
-    } catch (e) {
-      console.error("Save failed:", e);
+// Load saved game
+const storageKey = 'grind24_v2_' + userId;
+const saved = localStorage.getItem(storageKey);
+if (saved) {
+  try {
+    const loaded = JSON.parse(saved);
+    const elapsed = Date.now() - loaded.startTime;
+    if (elapsed < DURATION && !loaded.completed) {
+      game = {...game, ...loaded};
+    } else if (loaded.balance > loaded.bestScore) {
+      game.bestScore = loaded.balance;
     }
-  }, 300);
+  } catch(e) {}
 }
 
-// Calculations
-function getAssetPrice() {
-  return Math.floor(BASE_ASSET_PRICE * Math.pow(PRICE_MULTIPLIER, game.assets));
+// DOM Elements
+const balanceEl = document.getElementById('balance');
+const incomeEl = document.getElementById('income');
+const timerEl = document.getElementById('timer');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const rankEmoji = document.getElementById('rankEmoji');
+const rankTitle = document.getElementById('rankTitle');
+const assetsEl = document.getElementById('assets');
+const tapsEl = document.getElementById('taps');
+const bestScoreEl = document.getElementById('bestScore');
+const assetBtn = document.getElementById('assetBtn');
+const assetPriceEl = document.getElementById('assetPrice');
+const ownedCountEl = document.getElementById('ownedCount');
+const comboText = document.getElementById('comboText');
+const multiplierBadge = document.getElementById('multiplierBadge');
+const warningBanner = document.getElementById('warningBanner');
+const leaderTeaser = document.getElementById('leaderTeaser');
+const criticalText = document.getElementById('criticalText');
+const flash = document.getElementById('flash');
+const userIdEl = document.getElementById('userId');
+const continueBtn = document.getElementById('continueBtn');
+
+userIdEl.textContent = userId.substr(-4);
+if (game.multiplier > 1) multiplierBadge.style.display = 'inline-block';
+
+function getPrice() {
+  return Math.floor(BASE_PRICE * Math.pow(PRICE_MULT, game.assets));
 }
 
-function getRole() {
-  const b = game.balance;
-  if (b >= GOAL) return "🏆 Winner";
-  if (b >= 8000) return "💎 Tycoon";
-  if (b >= 5000) return "📈 Investor";
-  if (b >= 2500) return "💼 Entrepreneur";
-  if (b >= 1000) return "🔥 Hustler";
-  if (b >= 500) return "📊 Trader";
-  if (b >= 100) return "🌱 Starter";
-  return "😴 Nobody";
+function getRank(balance) {
+  if (balance >= GOAL) return {emoji: '👑', title: 'SIGMA CEO', color: '#ffd700'};
+  if (balance >= 8000) return {emoji: '🐺', title: 'ALPHA GRINDER', color: '#fff'};
+  if (balance >= 5000) return {emoji: '🔥', title: 'HUSTLER', color: '#ff9500'};
+  if (balance >= 2500) return {emoji: '⚡', title: 'ENTREPRENEUR', color: '#30d158'};
+  if (balance >= 1000) return {emoji: '📈', title: 'TRADER', color: '#30d158'};
+  if (balance >= 500) return {emoji: '🌱', title: 'STARTER', color: '#888'};
+  return {emoji: '💀', title: 'BROKE', color: '#666'};
 }
 
-function getTimeLeft() {
-  if (!game.startTime) return DURATION;
-  return Math.max(0, DURATION - (Date.now() - game.startTime));
+function formatMoney(num) {
+  return '$' + Math.floor(num).toLocaleString();
 }
 
-function formatMoney(amount) {
-  return "$" + Math.floor(amount).toLocaleString();
+function createParticle(x, y, text, color = '#ffd700') {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.textContent = text;
+  p.style.left = x + 'px';
+  p.style.top = y + 'px';
+  p.style.color = color;
+  p.style.setProperty('--tx', (Math.random() - 0.5) * 100 + 'px');
+  p.style.setProperty('--ty', -100 - Math.random() * 50 + 'px');
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 800);
 }
 
-function formatTime(ms) {
-  if (ms <= 0) return "Time's up!";
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  const s = Math.floor((ms % 60000) / 1000);
-  if (h > 0) return `${h}h ${m}m remaining`;
-  return `${m}m ${s}s remaining`;
+function showCritical() {
+  criticalText.classList.add('show');
+  flash.classList.add('show');
+  document.body.classList.add('shake');
+  document.getElementById('tapBtn').classList.add('critical');
+
+  setTimeout(() => {
+    criticalText.classList.remove('show');
+    flash.classList.remove('show');
+    document.body.classList.remove('shake');
+    document.getElementById('tapBtn').classList.remove('critical');
+  }, 800);
 }
 
-// Visual Effects
-function showFloatingText(x, y, text, color = "#ffd700") {
-  const el = document.createElement("div");
-  el.className = "float-text";
-  el.textContent = text;
-  el.style.left = x + "px";
-  el.style.top = y + "px";
-  el.style.color = color;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1000);
-}
-
-function animateBalance() {
-  balanceEl.classList.add("pop");
-  setTimeout(() => balanceEl.classList.remove("pop"), 100);
-}
-
-function createConfetti() {
-  const colors = ["#ffd700", "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
-  for (let i = 0; i < 50; i++) {
-    setTimeout(() => {
-      const confetti = document.createElement("div");
-      confetti.className = "confetti";
-      confetti.style.left = Math.random() * 100 + "vw";
-      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-      confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
-      document.body.appendChild(confetti);
-      setTimeout(() => confetti.remove(), 4000);
-    }, i * 30);
-  }
-}
-
-function haptic(type = "light") {
-  if (tg.HapticFeedback) {
-    tg.HapticFeedback.impactOccurred(type);
-  }
-}
-
-// Game Logic
-function checkGameEnd() {
-  const timeLeft = getTimeLeft();
-
-  if (game.balance >= GOAL && !game.won) {
-    game.won = true;
-    game.completed = true;
-    endGame(true);
-    return true;
-  }
-
-  if (timeLeft <= 0 && !game.completed) {
-    game.completed = true;
-    endGame(false);
-    return true;
-  }
-
-  return false;
-}
-
-function endGame(won) {
-  if (won) {
-    modalTitle.textContent = "🎉 Challenge Complete!";
-    modalText.textContent = `You made ${formatMoney(game.balance)} in ${formatTime(DURATION - getTimeLeft())}!`;
-    modalTitle.style.color = "#ffd700";
-    createConfetti();
-    haptic("heavy");
-    tg.showAlert("Congratulations! You completed the 24H Hustle Challenge!");
-  } else {
-    modalTitle.textContent = "⏰ Time's Up!";
-    modalText.textContent = `You made ${formatMoney(game.balance)} out of ${formatMoney(GOAL)}. Try again!`;
-    modalTitle.style.color = "#ff6b6b";
-    haptic("heavy");
-  }
-  gameOverModal.classList.add("active");
-}
-
-function resetGame() {
-  game = {
-    balance: 0,
-    income: 0,
-    assets: 0,
-    taps: 0,
-    startTime: Date.now(),
-    completed: false,
-    won: false
-  };
-  gameOverModal.classList.remove("active");
-  debouncedSave();
-  updateUI();
-  haptic("medium");
-}
-
-// UI Updates
 function updateUI() {
-  // Balance
   balanceEl.textContent = formatMoney(game.balance);
-  ppsEl.textContent = `+${formatMoney(game.income)}/sec`;
+  incomeEl.textContent = Math.floor(game.income * game.multiplier);
+  assetsEl.textContent = game.assets;
+  tapsEl.textContent = game.taps.toLocaleString();
+  bestScoreEl.textContent = formatMoney(game.bestScore);
 
-  // Role
-  const currentRole = getRole();
-  roleEl.textContent = currentRole;
+  const timeLeft = Math.max(0, DURATION - (Date.now() - game.startTime));
+  const hours = Math.floor(timeLeft / 3600000);
+  const mins = Math.floor((timeLeft % 3600000) / 60000);
+  const secs = Math.floor((timeLeft % 60000) / 1000);
+  timerEl.textContent = `${hours.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
 
-  // Stats
-  assetCountEl.textContent = game.assets;
-  tapCountEl.textContent = game.taps.toLocaleString();
-  ownedCountEl.textContent = game.assets;
+  if (hours === 0 && mins < 30) {
+    timerEl.classList.add('critical');
+    if (mins < 5) timerEl.classList.add('danger');
+  }
 
-  // Progress Bar
-  const progress = Math.min(100, (game.balance / GOAL) * 100);
-  progressBar.style.width = progress + "%";
+  const pct = Math.min(100, (game.balance / GOAL) * 100);
+  progressBar.style.width = pct + '%';
+  progressText.textContent = Math.floor(pct) + '%';
 
-  // Timer
-  const timeLeft = getTimeLeft();
-  timerEl.textContent = formatTime(timeLeft);
-  if (timeLeft < 3600000) timerEl.style.color = "#ff4757";
-  else if (timeLeft < 7200000) timerEl.style.color = "#ffa502";
-  else timerEl.style.color = "#2ed573";
+  const rank = getRank(game.balance);
+  rankEmoji.textContent = rank.emoji;
+  rankTitle.textContent = rank.title;
+  rankTitle.style.color = rank.color;
 
-  // Asset Button
-  const price = getAssetPrice();
-  assetInfo.textContent = `${formatMoney(price)} → +$${ASSET_INCOME}/sec`;
+  const price = getPrice();
+  assetPriceEl.textContent = formatMoney(price);
+
+  if (game.assets > 0) {
+    ownedCountEl.style.display = 'block';
+    ownedCountEl.textContent = game.assets;
+  }
 
   if (game.balance >= price) {
-    assetBtn.classList.remove("disabled");
-    assetBtn.classList.add("affordable");
+    assetBtn.classList.remove('disabled');
+    assetBtn.classList.add('affordable');
   } else {
-    assetBtn.classList.add("disabled");
-    assetBtn.classList.remove("affordable");
+    assetBtn.classList.add('disabled');
+    assetBtn.classList.remove('affordable');
   }
 
-  // Status Text
-  if (game.won) {
-    statusEl.textContent = "🏆 Challenge completed! You're a winner!";
-  } else if (game.completed) {
-    statusEl.textContent = "Challenge failed. Tap Play Again to restart.";
-  } else {
-    const percent = Math.floor(progress);
-    const rank = percent > 80 ? "Top 1%" : percent > 50 ? "Top 10%" : percent > 20 ? "Top 25%" : "Keep grinding";
-    statusEl.textContent = `${rank} • ${percent}% to goal`;
+  // Show warning at $500 (where most quit)
+  if (game.balance >= 400 && game.balance <= 550 && !game.shownWarning) {
+    warningBanner.classList.add('show');
+    game.shownWarning = true;
+    setTimeout(() => warningBanner.classList.remove('show'), 5000);
   }
 
-  // Disable interactions if game over
-  if (game.completed) {
-    tapBtn.disabled = true;
-    assetBtn.classList.add("disabled");
+  // Combo indicator
+  if (game.combo > 5) {
+    comboText.textContent = `COMBO x${game.combo}!`;
+    comboText.classList.add('show');
   } else {
-    tapBtn.disabled = false;
+    comboText.classList.remove('show');
   }
 }
 
-// Event Handlers
-tapBtn.addEventListener("click", (e) => {
-  if (game.completed) return;
+function save() {
+  localStorage.setItem(storageKey, JSON.stringify(game));
+}
 
-  if (!game.startTime) game.startTime = Date.now();
+// Critical hit system
+function calculateTap() {
+  const now = Date.now();
+  let base = 5;
 
-  game.balance += TAP_VALUE;
+  // Combo system: consecutive taps within 500ms
+  if (now - game.lastTap < 500) {
+    game.combo++;
+    if (game.combo > 10) base += 2; // Bonus for high combo
+  } else {
+    game.combo = 1;
+  }
+  game.lastTap = now;
+
+  // Critical hit chance
+  const isCritical = Math.random() < CRITICAL_CHANCE;
+  if (isCritical) {
+    base *= CRITICAL_MULT;
+    showCritical();
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  } else {
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+  }
+
+  return base * game.multiplier;
+}
+
+// Tap handler
+document.getElementById('tapBtn').onclick = (e) => {
+  const amount = calculateTap();
+  game.balance += amount;
   game.taps++;
 
-  // Visual feedback
-  const rect = tapBtn.getBoundingClientRect();
-  const x = rect.left + rect.width / 2 + (Math.random() - 0.5) * 40;
+  if (game.balance > game.bestScore) game.bestScore = game.balance;
+
+  const rect = e.target.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
   const y = rect.top;
-  showFloatingText(x, y, "+$5");
-  animateBalance();
-  haptic("light");
 
-  checkGameEnd();
-  debouncedSave();
+  const amountText = amount > 20 ? '💥 +$' + amount : '+$' + amount;
+  createParticle(x, y, amountText, amount > 20 ? '#ff3b30' : '#ffd700');
+
+  balanceEl.classList.add('pop');
+  setTimeout(() => balanceEl.classList.remove('pop'), 100);
+
+  save();
   updateUI();
-});
 
-assetBtn.addEventListener("click", (e) => {
-  if (game.completed) return;
+  // Check win
+  if (game.balance >= GOAL && !game.won) {
+    game.won = true;
+    createConfetti();
+    setTimeout(() => {
+      alert("🏆 SIGMA CEO! You hit $10K! Share to flex.");
+    }, 500);
+  }
+};
 
-  const price = getAssetPrice();
+// Asset purchase
+assetBtn.onclick = (e) => {
+  const price = getPrice();
   if (game.balance < price) {
-    haptic("rigid");
-    showFloatingText(e.clientX, e.clientY, "Need more cash!", "#ff4757");
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('rigid');
+    createParticle(e.clientX, e.clientY, 'NEED MORE 💀', '#ff3b30');
     return;
   }
 
-  if (!game.startTime) game.startTime = Date.now();
-
   game.balance -= price;
   game.assets++;
-  game.income += ASSET_INCOME;
+  game.income += INCOME_PER_ASSET;
 
-  haptic("medium");
-  showFloatingText(e.clientX, e.clientY, `+${ASSET_INCOME}/sec!`, "#2ed573");
-  animateBalance();
+  if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+  createParticle(e.clientX, e.clientY, '+$2/sec ⚡', '#30d158');
 
-  debouncedSave();
+  save();
   updateUI();
-});
+};
 
-restartBtn.addEventListener("click", resetGame);
+// Invite/Flex
+document.getElementById('inviteBtn').onclick = () => {
+  const text = `💀 I'm at ${formatMoney(game.balance)} in 24H Grind\n⏰ ${Math.floor((DURATION - (Date.now() - game.startTime))/3600000)}h left\n\n🔥 94% quit before $1K. I won't.\n\nTry to beat me:`;
+  const url = `https://t.me/${tg.initDataUnsafe?.bot?.username || 'yourbot'}?start=${userId}`;
 
-// Passive Income Loop
+  tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);
+
+  if (!game.claimedBonus) {
+    game.multiplier += 0.1;
+    game.claimedBonus = true;
+    multiplierBadge.style.display = 'inline-block';
+    multiplierBadge.textContent = '+' + ((game.multiplier - 1) * 100).toFixed(0) + '%';
+    alert("🎉 +10% Speed Bonus Activated!");
+    save();
+    updateUI();
+  }
+};
+
+// Fake social proof
 setInterval(() => {
-  if (game.completed || game.income === 0) return;
+  if (Math.random() > 0.6) { // 40% chance every 5 seconds
+    const name = fakeNames[currentFakeIndex % fakeNames.length];
+    const score = Math.floor(game.balance + Math.random() * 2000 - 1000);
+    if (score > 0) {
+      document.getElementById('leaderName').textContent = name;
+      document.getElementById('leaderScore').textContent = formatMoney(score);
+      leaderTeaser.style.display = 'flex';
 
-  game.balance += game.income;
-  checkGameEnd();
-  debouncedSave();
+      if (score > game.balance && Math.random() > 0.5) {
+        document.getElementById('passedYou').style.display = 'block';
+        setTimeout(() => document.getElementById('passedYou').style.display = 'none', 3000);
+      } else {
+        document.getElementById('passedYou').style.display = 'none';
+      }
+
+      currentFakeIndex++;
+      setTimeout(() => leaderTeaser.style.display = 'none', 4000);
+    }
+  }
+}, 5000);
+
+// Passive income
+setInterval(() => {
+  if (game.income > 0) {
+    game.balance += game.income * game.multiplier;
+    if (game.balance > game.bestScore) game.bestScore = game.balance;
+    save();
+    updateUI();
+  }
+}, 1000);
+
+// Game loop
+const gameLoop = setInterval(() => {
+  const timeLeft = DURATION - (Date.now() - game.startTime);
+
+  if (timeLeft <= 0 && !game.completed) {
+    game.completed = true;
+    clearInterval(gameLoop);
+
+    // Show continue option if they were close
+    if (game.balance > 5000) {
+      continueBtn.style.display = 'block';
+      document.getElementById('modalText').innerHTML =
+        `You made ${formatMoney(game.balance)}.<br>So close to $10K! Watch ad to continue?`;
+    } else {
+      document.getElementById('modalText').innerHTML =
+        `You made ${formatMoney(game.balance)}.<br>94% of players quit here.`;
+    }
+
+    document.getElementById('gameOverModal').classList.add('active');
+    save();
+  }
+
   updateUI();
 }, 1000);
 
-// Initialize
-function init() {
-  try {
-    const saved = localStorage.getItem(KEY);
-    if (saved) {
-      const loaded = JSON.parse(saved);
-      // Validate data
-      if (loaded && typeof loaded.balance === "number") {
-        game = {...game, ...loaded};
-        // Check if already expired
-        if (getTimeLeft() <= 0 && !game.completed) {
-          game.completed = true;
-        }
-      }
-    } else {
-      game.startTime = Date.now();
-    }
-  } catch (e) {
-    console.error("Load failed:", e);
-    game.startTime = Date.now();
+// Restart
+document.getElementById('restartBtn').onclick = () => {
+  if (game.balance >= GOAL) {
+    game.prestigeLevel = (game.prestigeLevel || 0) + 1;
+    game.multiplier = 1 + (game.prestigeLevel * 0.1);
+    alert(`🏆 Prestige ${game.prestigeLevel} Unlocked! +${(game.prestigeLevel * 10)}% Permanent Bonus!`);
   }
 
-  updateUI();
+  game.balance = 0;
+  game.income = 0;
+  game.assets = 0;
+  game.taps = 0;
+  game.startTime = Date.now();
+  game.completed = false;
+  game.won = false;
+  game.shownWarning = false;
 
-  // Set theme
-  if (tg.setHeaderColor) tg.setHeaderColor("#0f0f0f");
-  if (tg.setBackgroundColor) tg.setBackgroundColor("#0f0f0f");
+  document.getElementById('gameOverModal').classList.remove('active');
+  continueBtn.style.display = 'none';
+  save();
+  updateUI();
+};
+
+// Share from modal
+document.getElementById('shareBtn').onclick = () => {
+  document.getElementById('inviteBtn').click();
+};
+
+// Continue with ad (placeholder)
+continueBtn.onclick = () => {
+  alert("Ad would play here - you get +1 hour added!");
+  game.startTime += 3600000; // Add 1 hour
+  game.completed = false;
+  continueBtn.style.display = 'none';
+  document.getElementById('gameOverModal').classList.remove('active');
+  save();
+  updateUI();
+};
+
+function createConfetti() {
+  for (let i = 0; i < 50; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = ['#ffd700', '#ff3b30', '#30d158', '#ff9500'][Math.floor(Math.random() * 4)];
+    c.style.animationDelay = Math.random() * 0.5 + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2000);
+  }
 }
 
-init();
-
-// Visibility API - save when switching tabs
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    debouncedSave();
+// Before unload
+window.addEventListener('beforeunload', (e) => {
+  const timeLeft = DURATION - (Date.now() - game.startTime);
+  if (timeLeft > 0 && timeLeft < DURATION && game.balance > 1000) {
+    e.preventDefault();
+    e.returnValue = '⏰ You have money on the line! Stay and grind!';
   }
 });
-</script>
 
+updateUI();
+</script>
 </body>
 </html>
